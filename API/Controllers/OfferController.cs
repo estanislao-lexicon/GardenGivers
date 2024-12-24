@@ -56,7 +56,7 @@ namespace API.Controllers
                 return BadRequest(ModelState);
 
             var offer = _offerRepository.GetOffers()
-                .Where(c => c.Name.Trim().ToUpper() == offerCreate.Name.TrimEnd().ToUpper())
+                .Where(o => o.Quantity == offerCreate.Quantity)
                 .FirstOrDefault();
 
             if(offer != null)
@@ -88,7 +88,7 @@ namespace API.Controllers
             if (updatedOffer == null)
                 return BadRequest(ModelState);
 
-            if (offerId != updatedOffer.Id)
+            if (offerId != updatedOffer.OfferId)
                 return BadRequest(ModelState);
 
             if (!_offerRepository.OfferExists(offerId))
@@ -131,7 +131,5 @@ namespace API.Controllers
 
             return NoContent();
         }
-
-
     }
 }

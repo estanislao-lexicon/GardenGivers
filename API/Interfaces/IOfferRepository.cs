@@ -5,11 +5,11 @@ namespace API.Interfaces
     public interface IOfferRepository
     {
         ICollection<Offer> GetOffers();
-        Produce GetOffer(int offerId);        
+        Offer GetOffer(int offerId);        
         bool OfferExists(int offerId);
         bool CreateOffer(Offer offer);
         bool UpdateOffer(Offer offer);
         bool DeleteOffer(Offer offer);
-        bool Save();
+        bool Save();        
     }
 }

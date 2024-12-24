@@ -2,10 +2,10 @@
 erDiagram
     Users {
         int UserId PK
-        string FirstName
+        string FirstName [StringLength(50)]
         string LastName
-        string Email
-        string PasswordHash
+        string Email [Required]        
+        string PasswordHash [Required]
         string Address
         string City
         string PostNumber        
@@ -14,7 +14,7 @@ erDiagram
 
     Produce {
         int ProduceId PK
-        string Name
+        string Name [StringLength(50)]
         string Description
     }
 

@@ -1,43 +1,54 @@
 using API.Interfaces;
 using API.Models;
+using API.Data;
 
 namespace API.Repository
 {
     public class UserRepository : IUserRepository
     {
+        private readonly DataContext _context;
+
+        public UserRepository(DataContext context)
+        {
+            _context = context;
+        }
         public bool CreateUser(User user)
         {
-            throw new NotImplementedException();
+            _context.Add(user);
+            return Save();
         }
 
         public bool DeleteUser(User user)
         {
-            throw new NotImplementedException();
+            _context.Remove(user);
+            return Save();
         }
 
         public User GetUser(int userId)
         {
-            throw new NotImplementedException();
+            return _context.Users.Where(u => u.UserId == userId).FirstOrDefault();
         }
 
         public ICollection<User> GetUsers()
         {
-            throw new NotImplementedException();
+            return _context.Users.ToList();
         }
 
-        public bool Save()
+        public bool UserExists(int userId)
         {
-            throw new NotImplementedException();
+            return _context.Users.Any(u => u.UserId == userId);
         }
 
         public bool UpdateUser(User user)
         {
-            throw new NotImplementedException();
+            _context.Update(user);
+            return Save();
         }
 
-        public bool UserExists(int userIdId)
+        public bool Save()
         {
-            throw new NotImplementedException();
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

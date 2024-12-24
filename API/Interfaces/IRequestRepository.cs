@@ -9,7 +9,7 @@ namespace API.Interfaces
         bool RequestExists(int requestId);
         bool CreateRequest(Request request);
         bool UpdateRequest(Request request);
-        bool DeleteRquest(Request request);
+        bool DeleteRequest(Request request);
         bool Save();
     }
 }

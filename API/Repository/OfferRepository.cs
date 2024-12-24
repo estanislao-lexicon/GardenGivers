@@ -1,43 +1,56 @@
 using API.Interfaces;
 using API.Models;
+using API.Data;
+
 
 namespace API.Repository
 {
     public class OfferRepository : IOfferRepository
     {
+        private readonly DataContext _context;
+
+        public OfferRepository(DataContext context)
+        {
+            _context = context;
+        }
+
         public bool CreateOffer(Offer offer)
         {
-            throw new NotImplementedException();
+            _context.Add(offer);
+            return Save();
         }
 
         public bool DeleteOffer(Offer offer)
         {
-            throw new NotImplementedException();
+            _context.Remove(offer);
+            return Save();
         }
 
-        public Produce GetOffer(int offerId)
+        public Offer GetOffer(int offerId)
         {
-            throw new NotImplementedException();
+            return _context.Offers.Where(o => o.OfferId == offerId).FirstOrDefault();
         }
 
         public ICollection<Offer> GetOffers()
         {
-            throw new NotImplementedException();
+            return _context.Offers.ToList();
         }
 
         public bool OfferExists(int offerId)
         {
-            throw new NotImplementedException();
+            return _context.Offers.Any(o => o.OfferId == offerId);
         }
 
         public bool Save()
         {
-            throw new NotImplementedException();
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
 
         public bool UpdateOffer(Offer offer)
         {
-            throw new NotImplementedException();
-        }
+            _context.Update(offer);
+            return Save();
+        }        
     }
 }

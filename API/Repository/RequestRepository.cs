@@ -1,28 +1,37 @@
 using API.Interfaces;
 using API.Models;
+using API.Data;
 
 namespace API.Repository
 {
     public class RequestRepository : IRequestRepository
     {
+        private readonly DataContext _context;
+
+        public RequestRepository(DataContext context)
+        {
+            _context = context;
+        }
         public bool CreateRequest(Request request)
         {
-            throw new NotImplementedException();
+           _context.Add(request);
+            return Save();
         }
 
-        public bool DeleteRquest(Request request)
+        public bool DeleteRequest(Request request)
         {
-            throw new NotImplementedException();
-        }
+            _context.Remove(request);
+            return Save();
+        }       
 
         public Request GetRequest(int requestId)
         {
-            throw new NotImplementedException();
+            return _context.Requests.Where(r => r.RequestId == requestId).FirstOrDefault();
         }
 
         public ICollection<Request> GetRequests()
         {
-            throw new NotImplementedException();
+            return _context.Requests.ToList();
         }
 
         public bool RequestExists(int requestId)
@@ -37,7 +46,8 @@ namespace API.Repository
 
         public bool UpdateRequest(Request request)
         {
-            throw new NotImplementedException();
+            _context.Update(request);
+            return Save();
         }
     }
 }

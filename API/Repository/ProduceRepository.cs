@@ -1,43 +1,54 @@
 using API.Interfaces;
 using API.Models;
+using API.Data;
+
 
 namespace API.Repository
 {
     public class ProduceRepository : IProduceRepository
     {
+        private readonly DataContext _context;
+
+        public ProduceRepository(DataContext context)
+        {
+            _context = context;
+        }
         public bool CreateProduce(Produce produce)
         {
-            throw new NotImplementedException();
-        }
+            _context.Add(produce);
+            return Save();        }
 
         public bool DeleteProduce(Produce produce)
         {
-            throw new NotImplementedException();
+            _context.Remove(produce);
+            return Save();
         }
 
         public Produce GetProduce(int produceId)
         {
-            throw new NotImplementedException();
+            return _context.Produces.Where(p => p.ProduceId == produceId).FirstOrDefault();
         }
 
         public ICollection<Produce> GetProduces()
         {
-            throw new NotImplementedException();
+            return _context.Produces.ToList();
         }
 
         public bool ProduceExists(int produceId)
         {
-            throw new NotImplementedException();
+            return _context.Produces.Any(p => p.ProduceId == produceId);
         }
 
         public bool Save()
         {
-            throw new NotImplementedException();
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
 
         public bool UpdateProduce(Produce produce)
         {
-            throw new NotImplementedException();
+            _context.Update(produce);
+            return Save();
         }
     }
 }
