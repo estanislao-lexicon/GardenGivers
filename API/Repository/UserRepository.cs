@@ -6,9 +6,9 @@ namespace API.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DataContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public UserRepository(DataContext context)
+        public UserRepository(ApplicationDBContext context)
         {
             _context = context;
         }

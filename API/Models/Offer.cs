@@ -4,7 +4,9 @@
     {        
         public int OfferId { get; set; }
         public int UserID { get; set; }
+        public User User { get; set; }
         public int ProduceID { get; set; }
+        public Produce Produce { get; set; }
         public decimal Quantity { get; set; }
         public bool IsFree { get; set; }
         public decimal Price { get; set; }

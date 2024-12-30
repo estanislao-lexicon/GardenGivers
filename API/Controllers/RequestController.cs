@@ -8,7 +8,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RequestController : Controller
+    public class RequestController : ControllerBase
     {
         private readonly IRequestRepository _requestRepository;
         private readonly IMapper _mapper;

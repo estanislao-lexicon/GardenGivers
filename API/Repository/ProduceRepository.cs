@@ -7,9 +7,9 @@ namespace API.Repository
 {
     public class ProduceRepository : IProduceRepository
     {
-        private readonly DataContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public ProduceRepository(DataContext context)
+        public ProduceRepository(ApplicationDBContext context)
         {
             _context = context;
         }

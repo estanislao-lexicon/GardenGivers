@@ -1,4 +1,4 @@
-﻿namespace API.Dto
+﻿namespace API.Dtos.Request
 {
     public class RequestDto
     {

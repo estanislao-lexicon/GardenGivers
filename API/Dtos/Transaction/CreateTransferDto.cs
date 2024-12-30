@@ -1,8 +1,9 @@
-﻿namespace API.Dto
+using System.Threading.Task;
+
+namespace API.Dtos.Transaction
 {
-    public class TransactionDto
+    public class CreateTransactionDto
     {
-        public int TransactionId { get; set; }
         public int OfferId { get; set; }
         public int RequestId { get; set; }
         public decimal Quantity { get; set; }

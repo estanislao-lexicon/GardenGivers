@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
-    [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDBContext))]
+    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -200,17 +200,21 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Offer", b =>
                 {
-                    b.HasOne("API.Models.Produce", null)
+                    b.HasOne("API.Models.Produce", "Produce")
                         .WithMany("Offers")
                         .HasForeignKey("ProduceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Models.User", null)
+                    b.HasOne("API.Models.User", "User")
                         .WithMany("Offers")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Produce");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Models.Request", b =>
@@ -230,17 +234,17 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Transaction", b =>
                 {
-                    b.HasOne("API.Models.Offer", null)
+                    b.HasOne("API.Models.Offer", "Offer")
                         .WithMany()
                         .HasForeignKey("OfferId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("API.Models.Offer", null)
                         .WithMany("Transactions")
                         .HasForeignKey("OfferId1");
 
-                    b.HasOne("API.Models.Request", null)
+                    b.HasOne("API.Models.Request", "Request")
                         .WithMany()
                         .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -249,6 +253,10 @@ namespace API.Migrations
                     b.HasOne("API.Models.Request", null)
                         .WithMany("Transactions")
                         .HasForeignKey("RequestId1");
+
+                    b.Navigation("Offer");
+
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("API.Models.Offer", b =>

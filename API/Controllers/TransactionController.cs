@@ -1,132 +1,106 @@
-using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using API.Dtos.Transaction;
 using API.Interfaces;
 using API.Models;
+using API.Data;
+using API.Helper;
+using API.Mappers;
+
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TransactionController : Controller
+    public class TransactionController : ControllerBase
     {
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly IMapper _mapper;
+        private readonly ApplicationDBContext _context;
+        private readonly ITransactionRepository _transactionRepo;
 
-        public TransactionController(ITransactionRepository transactionRepository, IMapper mapper)
+        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepo)
         {
-            _transactionRepository = transactionRepository;
-            _mapper = mapper;
+            _context = context;
+            _transactionRepo = transactionRepo;
         }
-
+        
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Transaction>))]
-        public IActionResult GetTransactions()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var transactions = _mapper.Map<List<TransactionDto>>(_transactionRepository.GetTransactions());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var transactions = await _transactionRepo.GetAllAsync(query);
+            
+            var transactionDto = transactions.Select(t => t.ToTransactionDto().ToList());
 
             return Ok(transactions);
         }
 
-        [HttpGet("{transactionId}")]
-        [ProducesResponseType(200, Type = typeof(Transaction))]
-        [ProducesResponseType(400)]
-        public IActionResult GetTransaction(int transactionId)
+        [HttpGet("{transactionId:int}")]        
+        public async Task<IActionResult> GetById([FromRoute] int transactionId)
         {
-            if (!_transactionRepository.TransactionExists(transactionId))
-                return NotFound();
-
-            var transaction = _mapper.Map<TransactionDto>(_transactionRepository.GetTransaction(transactionId));
-
+            
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState);    
+            
+            var transaction = await _transactionRepo.GetByIdAsync(transactionId);
 
-            return Ok(transaction);
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(transaction.ToTransactionDto());
         }      
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateTransaction([FromBody] TransactionDto transactionCreate)
+        [HttpPost]        
+        public async Task<IActionResult> Create([FromBody] CreateTransactionRequestDto transactionDto)
         {
-            if (transactionCreate == null)
-                return BadRequest(ModelState);
-
-            var transaction = _transactionRepository.GetTransactions()
-                .Where(t => t.Quantity == transactionCreate.Quantity)
-                .FirstOrDefault();
-
-            if(transaction != null)
-            {
-                ModelState.AddModelError("", "Transaction already exists");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var transactionMap = _mapper.Map<Transaction>(transactionCreate);
+            var transactionModel = transactionDto.ToTransactionFromCreateDTO();
+            
+            await _transactionRepo.CreateAsync(transactionModel);
 
-            if(!_transactionRepository.CreateTransaction(transactionMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Transaction successfully created");
+            return CreatedAtAction(nameof(GetById), new { id = transactionModel.transactionId }, transactionModel.ToTransactionDto()));
         }
 
-        [HttpPut("{transactionId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateTransaction(int transactionId, [FromBody]UserDto updatedTransaction)
+        [HttpPut]
+        [Route("{transactionId:int}")]        
+        public async Task<IActionResult> Update([FromRoute] int transactionId, [FromBody] UpdateTransactionRequestDto updatedDto)
         {
-            if (updatedTransaction == null)
-                return BadRequest(ModelState);
-
-            if (transactionId != updatedTransaction.UserId)
-                return BadRequest(ModelState);
-
-            if (!_transactionRepository.TransactionExists(transactionId))
-                return NotFound();
-
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var transactionMap = _mapper.Map<Transaction>(updatedTransaction);
-
-            if(!_transactionRepository.UpdateTransaction(transactionMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating transaction");
-                return StatusCode(500, ModelState);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{transactionId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteUser(int transactionId)
-        {
-            if(!_transactionRepository.TransactionExists(transactionId))
+            var transactionModel = await _transactionRepo.UpdateAsync(transactionId, updatedDto);
+            
+            if(transactionModel == null)
             {
                 return NotFound();
-            }
+            }            
 
-            var transactionToDelete = _transactionRepository.GetTransaction(transactionId);
+            return Ok(transactionModel.ToTransactionDto());
+        }
 
+        [HttpDelete]
+        [Route("{transactionId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int transactionId)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_transactionRepository.DeleteTransaction(transactionToDelete))
+            var transactionModel = await _transactionRepo.DeleteAsync(transactionId);
+
+            if (transactionModel == null)
             {
-                ModelState.AddModelError("", "Something went wrong deleting transaction");
+                return NotFound();
             }
 
             return NoContent();

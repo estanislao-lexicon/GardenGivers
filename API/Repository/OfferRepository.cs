@@ -7,9 +7,9 @@ namespace API.Repository
 {
     public class OfferRepository : IOfferRepository
     {
-        private readonly DataContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public OfferRepository(DataContext context)
+        public OfferRepository(ApplicationDBContext context)
         {
             _context = context;
         }

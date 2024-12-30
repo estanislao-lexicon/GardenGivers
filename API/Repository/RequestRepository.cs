@@ -6,9 +6,9 @@ namespace API.Repository
 {
     public class RequestRepository : IRequestRepository
     {
-        private readonly DataContext _context;
+        private readonly ApplicationDBContext _context;
 
-        public RequestRepository(DataContext context)
+        public RequestRepository(ApplicationDBContext context)
         {
             _context = context;
         }

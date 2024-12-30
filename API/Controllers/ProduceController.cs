@@ -8,7 +8,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProduceController : Controller
+    public class ProduceController : ControllerBase
     {
         private readonly IProduceRepository _produceRepository;
         private readonly IMapper _mapper;

@@ -11,9 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
-    [DbContext(typeof(DataContext))]
-    [Migration("20241223232304_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(ApplicationDBContext))]
+    [Migration("20241227213829_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,12 +43,14 @@ namespace API.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProduceID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserID")
@@ -99,6 +101,7 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
@@ -124,10 +127,17 @@ namespace API.Migrations
                     b.Property<int>("OfferId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("OfferId1")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RequestId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TransactionDate")
@@ -137,7 +147,11 @@ namespace API.Migrations
 
                     b.HasIndex("OfferId");
 
+                    b.HasIndex("OfferId1");
+
                     b.HasIndex("RequestId");
+
+                    b.HasIndex("RequestId1");
 
                     b.ToTable("Transactions");
                 });
@@ -189,17 +203,21 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Offer", b =>
                 {
-                    b.HasOne("API.Models.Produce", null)
+                    b.HasOne("API.Models.Produce", "Produce")
                         .WithMany("Offers")
                         .HasForeignKey("ProduceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Models.User", null)
+                    b.HasOne("API.Models.User", "User")
                         .WithMany("Offers")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Produce");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Models.Request", b =>
@@ -219,17 +237,29 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Transaction", b =>
                 {
+                    b.HasOne("API.Models.Offer", "Offer")
+                        .WithMany()
+                        .HasForeignKey("OfferId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("API.Models.Offer", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("OfferId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("OfferId1");
+
+                    b.HasOne("API.Models.Request", "Request")
+                        .WithMany()
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("API.Models.Request", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RequestId1");
+
+                    b.Navigation("Offer");
+
+                    b.Navigation("Request");
                 });
 
             modelBuilder.Entity("API.Models.Offer", b =>

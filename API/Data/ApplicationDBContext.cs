@@ -3,11 +3,11 @@ using API.Models;
 
 namespace API.Data
 {
-    public class DataContext : DbContext
+    public class ApplicationDBContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
-
+            
         }
 
         public DbSet<Offer> Offers { get; set; }
@@ -40,14 +40,14 @@ namespace API.Data
 
             // Configure the relationship between Transactions and Offers
             modelBuilder.Entity<Transaction>()
-                .HasOne<Offer>()
+                .HasOne(t => t.Offer)
                 .WithMany() // Assuming there is no navigation property on Offer
                 .HasForeignKey(t => t.OfferId)
-                .OnDelete(DeleteBehavior.Cascade); // You can change this to NoAction or Restrict if needed
+                .OnDelete(DeleteBehavior.NoAction); // You can change this to NoAction or Restrict if needed
 
             // Configure the relationship between Transactions and Requests
             modelBuilder.Entity<Transaction>()
-                .HasOne<Request>()
+                .HasOne(t => t.Request)
                 .WithMany() // Assuming there is no navigation property on Request
                 .HasForeignKey(t => t.RequestId)
                 .OnDelete(DeleteBehavior.NoAction); // To prevent cascade conflict

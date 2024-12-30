@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,9 +53,9 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserID = table.Column<int>(type: "int", nullable: false),
                     ProduceID = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsFree = table.Column<bool>(type: "bit", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -84,7 +84,7 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ProduceId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -112,8 +112,10 @@ namespace API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OfferId = table.Column<int>(type: "int", nullable: false),
                     RequestId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OfferId1 = table.Column<int>(type: "int", nullable: true),
+                    RequestId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,14 +124,22 @@ namespace API.Migrations
                         name: "FK_Transactions_Offers_OfferId",
                         column: x => x.OfferId,
                         principalTable: "Offers",
-                        principalColumn: "OfferId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "OfferId");
+                    table.ForeignKey(
+                        name: "FK_Transactions_Offers_OfferId1",
+                        column: x => x.OfferId1,
+                        principalTable: "Offers",
+                        principalColumn: "OfferId");
                     table.ForeignKey(
                         name: "FK_Transactions_Requests_RequestId",
                         column: x => x.RequestId,
                         principalTable: "Requests",
-                        principalColumn: "RequestId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "RequestId");
+                    table.ForeignKey(
+                        name: "FK_Transactions_Requests_RequestId1",
+                        column: x => x.RequestId1,
+                        principalTable: "Requests",
+                        principalColumn: "RequestId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -158,9 +168,19 @@ namespace API.Migrations
                 column: "OfferId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transactions_OfferId1",
+                table: "Transactions",
+                column: "OfferId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_RequestId",
                 table: "Transactions",
                 column: "RequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_RequestId1",
+                table: "Transactions",
+                column: "RequestId1");
         }
 
         /// <inheritdoc />
