@@ -1,56 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFramworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
+using API.Dtos.Offer;
+using API.Helpers;
 
 
 namespace API.Repository
 {
     public class OfferRepository : IOfferRepository
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
 
         public OfferRepository(ApplicationDBContext context)
         {
             _context = context;
         }
 
-        public bool CreateOffer(Offer offer)
+        public async Task<List<Offer>> GetAllAsync(QueryObject query)
         {
-            _context.Add(offer);
-            return Save();
+            return await _context.Offers.ToListAsync();
+        }
+        public async Task<Offer? > GetByIdAsync(int offerId)
+        {
+            return await _context.Offers.FindAsync(offerId);
+        }
+        public async Task<Offer> CreateAsync(Offer offerModel)
+        {
+            await _context.Offers.AddAsync(offerModel);
+            await _context.SaveChangesAsync();
+            return offerModel;
         }
 
-        public bool DeleteOffer(Offer offer)
+        public async Task<Offer?> DeleteAsync (int offerId)
         {
-            _context.Remove(offer);
-            return Save();
+            var offerModel = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId = offerId);
+            
+            if(offerModel == null)
+            {
+                return null;
+            }
+
+            _context.Offers.Remove(offerModel);
+            await _context.SaveChangesAsync();
+            return offerModel;
         }
 
-        public Offer GetOffer(int offerId)
-        {
-            return _context.Offers.Where(o => o.OfferId == offerId).FirstOrDefault();
+        public Task<bool> OfferExists(int offerId)
+        { 
+            return _context.Offers.AnyAsync(o => o.OfferId == offerId);
         }
-
-        public ICollection<Offer> GetOffers()
+        public async Task<Offer?> UpdateAsync (int offerId, UpdateOfferRequestDto offerDto)
         {
-            return _context.Offers.ToList();
+            var existingOffer = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId == offerId);
+
+            if(existingOffer == null)
+            {
+                return null;
+            }
+
+            existingOffer.Quantity = offerDto.Quantity;
+            existingOffer.IsFree = offerDto.IsFree;
+            existingOffer.Price = offerDto.Price;
+            existingOffer.DateCreated = offerDto.DateCreated;
+            existingOffer.ExpirationDate = offerDto.ExpirationDate;
+
+            await _context.SaveChangesAsync();
+            return existingOffer;
         }
-
-        public bool OfferExists(int offerId)
-        {
-            return _context.Offers.Any(o => o.OfferId == offerId);
-        }
-
-        public bool Save()
-        {
-            var saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
-        }
-
-        public bool UpdateOffer(Offer offer)
-        {
-            _context.Update(offer);
-            return Save();
-        }        
     }
 }

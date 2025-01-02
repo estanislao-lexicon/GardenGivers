@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFramworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
+using API.Dtos.Request;
+using API.Helpers;
 
 namespace API.Repository
 {
@@ -12,42 +19,53 @@ namespace API.Repository
         {
             _context = context;
         }
-        public bool CreateRequest(Request request)
+        public async Task<List<Request>> GetAllAsync(QueryObject query)
         {
-           _context.Add(request);
-            return Save();
+            return await _context.Requests.ToListAsync();
+        }
+        public async Task<Request?> GetByIdAsync(int requestId)
+        {
+            return await _context.Requests.Include(r => r.requestId).FirstOrDefaultAsync(i => i.RequestId == requestId);
+        }
+        public async Task<Request> CreateAsync(Request requestModel)
+        {
+            await _context.Requests.AddAsync(requestModel);
+            await _context.SaveChangesAsync();
+            return requestModel;
         }
 
-        public bool DeleteRequest(Request request)
+        public async Task<Request?> DeleteAsync (int requestId)
         {
-            _context.Remove(request);
-            return Save();
-        }       
+            var requestModel = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId = requestId);
+            
+            if(requestModel == null)
+            {
+                return null;
+            }
 
-        public Request GetRequest(int requestId)
-        {
-            return _context.Requests.Where(r => r.RequestId == requestId).FirstOrDefault();
+            _context.Requests.Remove(requestModel);
+            await _context.SaveChangesAsync();
+            return requestModel;
         }
 
-        public ICollection<Request> GetRequests()
-        {
-            return _context.Requests.ToList();
+        public Task<bool> RequestExists(int requestId)
+        { 
+            return _context.Requests.AnyAsync(r => r.RequestId == requestId);
         }
-
-        public bool RequestExists(int requestId)
+        public async Task<Request?> UpdateAsync (int requestId, UpdateRequestRequestDto requestDto)
         {
-            throw new NotImplementedException();
-        }
+            var existingRequest = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == requestId);
 
-        public bool Save()
-        {
-            throw new NotImplementedException();
-        }
+            if(existingRequest == null)
+            {
+                return null;
+            }
 
-        public bool UpdateRequest(Request request)
-        {
-            _context.Update(request);
-            return Save();
+            existingRequest.Quantity = requestDto.Quantity;
+            existingRequest.DateCreated = requestDto.DateCreated;
+
+            await _context.SaveChangesAsync();
+            return existingRequest;
         }
     }
 }

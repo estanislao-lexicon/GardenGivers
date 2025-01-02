@@ -1,8 +1,17 @@
-using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using API.Dtos.User;
 using API.Interfaces;
 using API.Models;
+using API.Data;
+using API.Helper;
+using API.Mappers;
+
 
 namespace API.Controllers
 {
@@ -10,123 +19,87 @@ namespace API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
+        private readonly ApplicationDBContext _context;    
+        private readonly IUserRepository _userRepository;        
 
-        public UserController(IUserRepository userRepository, IMapper mapper)
+        public UserController(ApplicationDBContext context, IUserRepository userRepository)
         {
-            _userRepository = userRepository;
-            _mapper = mapper;
+            _context = context;
+            _userRepository = userRepository;            
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        public IActionResult GetUsers()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] QuestyObject query)
         {
-            var users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(users);
+            var users = await _userRepository.GetAllAsync(query);
+            var userDto = users.Select(u => u.ToUserDto().ToList());
+
+            return Ok(userDto);
         }
 
-        [HttpGet("{userId}")]
-        [ProducesResponseType(200, Type = typeof(Offer))]
-        [ProducesResponseType(400)]
-        public IActionResult GetUser(int userId)
+        [HttpGet("{userId:int}")]
+        
+        public async Task<IActionResult> GetById([FromRoute] int userId)
         {
-            if (!_userRepository.UserExists(userId))
-                return NotFound();
-
-            var user = _mapper.Map<UserDto>(_userRepository.GetUser(userId));
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(user);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user.ToUserDto());
         }      
 
         [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] UserDto userCreate)
+        
+        public async Task<IActionResult> Create([FromBody] CreateUserDto userDto)
         {
-            if (userCreate == null)
-                return BadRequest(ModelState);
-
-            var user = _userRepository.GetUsers()
-                .Where(u => u.FirstName.Trim().ToUpper() == userCreate.FirstName.TrimEnd().ToUpper())
-                .FirstOrDefault();
-
-            if(user != null)
-            {
-                ModelState.AddModelError("", "User already exists");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userMap = _mapper.Map<User>(userCreate);
+            var userModel = userDto.ToUserFromCreateDto();
 
-            if(!_userRepository.CreateUser(userMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
+            await _userRepository.CreateAsync(userModel);
 
-            return Ok("User successfully created");
+            return CreateAtAction(nameof(GetById), new { id = userModel.userId }, userModel.ToUserDto());
         }
 
-        [HttpPut("{userId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateUser(int userId, [FromBody]UserDto updatedUser)
+        [HttpPut]
+        [Route("{userId:int}")]
+        public async Task<IActionResult> Update([FromRoute] int userId, [FromBody] UpdateUserRequestDto updatedDto)
         {
-            if (updatedUser == null)
-                return BadRequest(ModelState);
-
-            if (userId != updatedUser.UserId)
-                return BadRequest(ModelState);
-
-            if (!_userRepository.UserExists(userId))
-                return NotFound();
-
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var userMap = _mapper.Map<User>(updatedUser);
+            var userModel = await _userRepository.UpdateAsync(userId, updatedDto);
 
-            if(!_userRepository.UpdateUser(userMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating user");
-                return StatusCode(500, ModelState);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{userId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteUser(int userId)
-        {
-            if(!_userRepository.UserExists(userId))
+            if(userModel == null)
             {
                 return NotFound();
             }
 
-            var userToDelete = _userRepository.GetUser(userId);
+            return Ok(userModel.ToUserDto());
+        }
 
+        [HttpDelete]
+        [Route("{userId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int userId)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_userRepository.DeleteUser(userToDelete))
+            var userModel = await _userRepository.DeleteAsync(userId);
+
+            if (userModel == null)
             {
-                ModelState.AddModelError("", "Something went wrong deleting user");
+                return NotFound();
             }
 
             return NoContent();

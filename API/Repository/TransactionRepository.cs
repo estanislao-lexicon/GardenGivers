@@ -18,31 +18,31 @@ namespace API.Repository
         {
             _context = context;
         }
-        public async Task<Lis<Transaction>> GetAllAsync(QueryObject query)
+        public async Task<List<Transaction>> GetAllAsync(QueryObject query)
         {
-            return await _context.Transaction.ToListAsync();
+            return await _context.Transactions.ToListAsync();
         }
-        public async Task<Transaction> GetByIdAsync(int transactionId)
+        public async Task<Transaction?> GetByIdAsync(int transactionId)
         {
-            return await _context.Transaction.Include(t => t.transactionId).FirstOrDefaultAsync(i => i.transactionId == transactionId);
+            return await _context.Transactions.Include(t => t.transactionId).FirstOrDefaultAsync(i => i.TransactionId == transactionId);
         }
         public async Task<Transaction> CreateAsync(Transaction transactionModel)
         {
-            await _context.Transaction.AddAsync(transactionModel);
+            await _context.Transactions.AddAsync(transactionModel);
             await _context.SaveChangesAsync();
             return transactionModel;
         }
 
         public async Task<Transaction?> DeleteAsync (int transactionId)
         {
-            var transactionModel = await _context.Transaction.FirstOrDefaultAsync(t => t.TransactionId = transactionId);
+            var transactionModel = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId = transactionId);
             
             if(transactionModel == null)
             {
                 return null;
             }
 
-            _context.Transaction.Remove(transactionModel);
+            _context.Transactions.Remove(transactionModel);
             await _context.SaveChangesAsync();
             return transactionModel;
         }
@@ -53,7 +53,7 @@ namespace API.Repository
         }
         public async Task<Transaction?> UpdateAsync (int transactionId, UpdateTransactionRequestDto transactionDto)
         {
-            var existingTransaction = await _context.Transaction.FirstOrDefaultAsync(t => t.TransactionId == transactionId);
+            var existingTransaction = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == transactionId);
 
             if(existingTransaction == null)
             {

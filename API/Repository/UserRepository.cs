@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFramworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
+using API.Dtos.User;
+using API.Helpers;
 
 namespace API.Repository
 {
@@ -12,43 +19,58 @@ namespace API.Repository
         {
             _context = context;
         }
-        public bool CreateUser(User user)
+        public async Task<List<User>> GetAllAsync(QueryObject query)
         {
-            _context.Add(user);
-            return Save();
+            return await _context.Users.ToListAsync();
+        }
+        public async Task<User?> GetByIdAsync(int userId)
+        {
+            return await _context.Users.Include(u => u.userId).FirstOrDefaultAsync(i => i.UserId == userId);
+        }
+        public async Task<User> CreateAsync(User userModel)
+        {
+            await _context.Users.AddAsync(userModel);
+            await _context.SaveChangesAsync();
+            return userModel;
         }
 
-        public bool DeleteUser(User user)
+        public async Task<User?> DeleteAsync (int userId)
         {
-            _context.Remove(user);
-            return Save();
+            var userModel = await _context.Users.FirstOrDefaultAsync(u => u.UserId = userId);
+            
+            if(userModel == null)
+            {
+                return null;
+            }
+
+            _context.User.Remove(userModel);
+            await _context.SaveChangesAsync();
+            return userModel;
         }
 
-        public User GetUser(int userId)
-        {
-            return _context.Users.Where(u => u.UserId == userId).FirstOrDefault();
+        public Task<bool> UserExists(int userId)
+        { 
+            return _context.Users.AnyAsync(u => u.UserId == userId);
         }
-
-        public ICollection<User> GetUsers()
+        public async Task<User?> UpdateAsync (int userId, UpdateUserRequestDto userDto)
         {
-            return _context.Users.ToList();
-        }
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
 
-        public bool UserExists(int userId)
-        {
-            return _context.Users.Any(u => u.UserId == userId);
-        }
+            if(existingUser == null)
+            {
+                return null;
+            }
 
-        public bool UpdateUser(User user)
-        {
-            _context.Update(user);
-            return Save();
-        }
+            existingUser.FirstName = userDto.FirstName;
+            existingUser.LastName = userDto.LastName;
+            existingUser.Email = userDto.Email;
+            existingUser.City = userDto.City;
+            existingUser.Address = userDto.Address;
+            existingUser.PostNumber = userDto.PostNumber;
+            existingUser.DateCreated = userDto.DateCreated;            
 
-        public bool Save()
-        {
-            var saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
+            await _context.SaveChangesAsync();
+            return existingUser;
         }
     }
 }

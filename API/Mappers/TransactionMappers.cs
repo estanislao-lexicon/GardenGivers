@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Task;
 using API.Models;
-using API.DTOS.Transaction;
+using API.Dtos.Transaction;
 
 namespace API.Mappers
 {
@@ -18,7 +18,7 @@ namespace API.Mappers
                 RequestId = transactionModel.RequestId,
                 Quantity = transactionModel.Quantity,
                 TransactionDate = transactionModel.TransactionDate
-            }
+            };
         }
 
         public static Transaction ToTransactionFromCreateDTO(this CreateTransactionRequestDto transactionDto)
@@ -29,7 +29,7 @@ namespace API.Mappers
                 RequestId = transactionDto.RequestId,
                 Quantity = transactionDto.Quantity,
                 TransactionDate = transactionDto.TransactionDate
-            }
+            };
         }
     }
 }

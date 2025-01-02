@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFramworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
+using API.Dtos.Produce;
+using API.Helpers;
 
 
 namespace API.Repository
@@ -13,42 +20,53 @@ namespace API.Repository
         {
             _context = context;
         }
-        public bool CreateProduce(Produce produce)
+        public async Task<List<Produce>> GetAllAsync(QueryObject query)
         {
-            _context.Add(produce);
-            return Save();        }
-
-        public bool DeleteProduce(Produce produce)
+            return await _context.Produces.ToListAsync();
+        }
+        public async Task<Produce?> GetByIdAsync(int produceId)
         {
-            _context.Remove(produce);
-            return Save();
+            return await _context.Produces.Include(p => p.produceId).FirstOrDefaultAsync(i => i.ProduceId == produceId);
+        }
+        public async Task<Produce> CreateAsync(Produce produceModel)
+        {
+            await _context.Produces.AddAsync(produceModel);
+            await _context.SaveChangesAsync();
+            return produceModel;
         }
 
-        public Produce GetProduce(int produceId)
+        public async Task<Produce?> DeleteAsync (int produceId)
         {
-            return _context.Produces.Where(p => p.ProduceId == produceId).FirstOrDefault();
+            var produceModel = await _context.Produces.FirstOrDefaultAsync(p => p.ProduceId = produceId);
+            
+            if(produceModel == null)
+            {
+                return null;
+            }
+
+            _context.Produces.Remove(produceModel);
+            await _context.SaveChangesAsync();
+            return produceModel;
         }
 
-        public ICollection<Produce> GetProduces()
-        {
-            return _context.Produces.ToList();
+        public Task<bool> ProduceExists(int produceId)
+        { 
+            return _context.Produce.AnyAsync(p => p.ProduceId == produceId);
         }
-
-        public bool ProduceExists(int produceId)
+        public async Task<Produce?> UpdateAsync (int produceId, UpdateProduceRequestDto produceDto)
         {
-            return _context.Produces.Any(p => p.ProduceId == produceId);
-        }
+            var existingProduce = await _context.Produce.FirstOrDefaultAsync(p => p.ProduceId == produceId);
 
-        public bool Save()
-        {
-            var saved = _context.SaveChanges();
-            return saved > 0 ? true : false;
-        }
+            if(existingProduce == null)
+            {
+                return null;
+            }
 
-        public bool UpdateProduce(Produce produce)
-        {
-            _context.Update(produce);
-            return Save();
+            existingProduce.Name = produceDto.Name;
+            existingProduce.Description = produceDto.Description;
+
+            await _context.SaveChangesAsync();
+            return existingProduce;
         }
     }
 }

@@ -1,8 +1,17 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using API.Dtos.Offer;
 using API.Interfaces;
 using API.Models;
+using API.Data;
+using API.Helper;
+using API.Mappers;
+
 
 namespace API.Controllers
 {
@@ -10,123 +19,88 @@ namespace API.Controllers
     [ApiController]
     public class OfferController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
         private readonly IOfferRepository _offerRepository;
-        private readonly IMapper _mapper;
 
-        public OfferController(IOfferRepository offerRepository, IMapper mapper)
+        private OfferController(ApplicationDBContext context, IOfferRepository offerRepository)
         {
+            _context = context;
             _offerRepository = offerRepository;
-            _mapper = mapper;
         }
-
+        
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Offer>))]
-        public IActionResult GetOffers()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var offers = _mapper.Map<List<OfferDto>>(_offerRepository.GetOffers());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(offers);
+            var offers = await _offerRepository.GetAllAsync(query);
+            
+            var offerDto = offers.Select(o => o.ToOfferDto().ToList());
+
+            return Ok(offerDto);
         }
 
-        [HttpGet("{offerId}")]
-        [ProducesResponseType(200, Type = typeof(Offer))]
-        [ProducesResponseType(400)]
-        public IActionResult GetOffer(int offerId)
+        [HttpGet("{offerId:int}")]        
+        public async Task<IActionResult> GetById([FromRoute] int offerId)
         {
-            if (!_offerRepository.OfferExists(offerId))
-                return NotFound();
-
-            var offer = _mapper.Map<OfferDto>(_offerRepository.GetOffer(offerId));
-
+            
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState);    
+            
+            var offer = await _offerRepository.GetByIdAsync(offerId);
 
-            return Ok(offer);
+            if (offer == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(offer.ToOfferDto());
         }      
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateOffer([FromBody] OfferDto offerCreate)
+        [HttpPost]        
+        public async Task<IActionResult> Create([FromBody] CreateOfferDto offerDto)
         {
-            if (offerCreate == null)
-                return BadRequest(ModelState);
-
-            var offer = _offerRepository.GetOffers()
-                .Where(o => o.Quantity == offerCreate.Quantity)
-                .FirstOrDefault();
-
-            if(offer != null)
-            {
-                ModelState.AddModelError("", "Offer already exists");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var offerMap = _mapper.Map<Offer>(offerCreate);
+            var offerModel = offerDto.ToOfferFromCreateDto();
+            
+            await _offerRepository.CreateAsync(offerModel);
 
-            if(!_offerRepository.CreateOffer(offerMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully created");
+            return CreatedAtAction(nameof(GetById), new { id = offerModel.offerId }, offerModel.ToOfferDto());
         }
 
-        [HttpPut("{offerId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateOffer(int offerId, [FromBody]OfferDto updatedOffer)
+        [HttpPut]
+        [Route("{offerId:int}")]        
+        public async Task<IActionResult> Update([FromRoute] int offerId, [FromBody] UpdateOfferRequestDto updatedDto)
         {
-            if (updatedOffer == null)
-                return BadRequest(ModelState);
-
-            if (offerId != updatedOffer.OfferId)
-                return BadRequest(ModelState);
-
-            if (!_offerRepository.OfferExists(offerId))
-                return NotFound();
-
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var offerMap = _mapper.Map<Offer>(updatedOffer);
-
-            if(!_offerRepository.UpdateOffer(offerMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating offer");
-                return StatusCode(500, ModelState);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{offerId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteOffer(int offerId)
-        {
-            if(!_offerRepository.OfferExists(offerId))
+            var offerModel = await _offerRepository.UpdateAsync(offerId, updatedDto);
+            
+            if(offerModel == null)
             {
                 return NotFound();
-            }
+            }            
 
-            var offerToDelete = _offerRepository.GetOffer(offerId);
+            return Ok(offerModel.ToOfferDto());
+        }
 
+        [HttpDelete]
+        [Route("{offerId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int offerId)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_offerRepository.DeleteOffer(offerToDelete))
+            var offerModel = await _offerRepository.DeleteAsync(offerId);
+
+            if (offerModel == null)
             {
-                ModelState.AddModelError("", "Something went wrong deleting offer");
+                return NotFound();
             }
 
             return NoContent();

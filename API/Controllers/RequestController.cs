@@ -1,8 +1,17 @@
-using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using API.Dtos.Request;
 using API.Interfaces;
 using API.Models;
+using API.Data;
+using API.Helper;
+using API.Mappers;
+
 
 namespace API.Controllers
 {
@@ -10,123 +19,88 @@ namespace API.Controllers
     [ApiController]
     public class RequestController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
         private readonly IRequestRepository _requestRepository;
-        private readonly IMapper _mapper;
 
-        public RequestController(IRequestRepository requestRepository, IMapper mapper)
+        private RequestController(ApplicationDBContext context, IRequestRepository requestRepository)
         {
+            _context = context;
             _requestRepository = requestRepository;
-            _mapper = mapper;
         }
-
+        
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Request>))]
-        public IActionResult GetRequests()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var requests = _mapper.Map<List<RequestDto>>(_requestRepository.GetRequests());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(requests);
+            var requests = await _requestRepository.GetAllAsync(query);
+            
+            var requestDto = requests.Select(r => r.ToRequestDto().ToList());
+
+            return Ok(requestDto);
         }
 
-        [HttpGet("{requestId}")]
-        [ProducesResponseType(200, Type = typeof(Request))]
-        [ProducesResponseType(400)]
-        public IActionResult GetRequest(int requestId)
+        [HttpGet("{requestId:int}")]        
+        public async Task<IActionResult> GetById([FromRoute] int requestId)
         {
-            if (!_requestRepository.RequestExists(requestId))
-                return NotFound();
-
-            var request = _mapper.Map<RequestDto>(_requestRepository.GetRequest(requestId));
-
+            
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState);    
+            
+            var request = await _requestRepository.GetByIdAsync(requestId);
 
-            return Ok(request);
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(request.ToRequestDto());
         }      
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateRequest([FromBody] RequestDto requestCreate)
+        [HttpPost]        
+        public async Task<IActionResult> Create([FromBody] CreateRequestDto requestDto)
         {
-            if (requestCreate == null)
-                return BadRequest(ModelState);
-
-            var request = _requestRepository.GetRequests()
-            .Where(r => r.Quantity == requestCreate.Quantity)
-                .FirstOrDefault();
-
-            if(request != null)
-            {
-                ModelState.AddModelError("", "Request already exists");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var requestMap = _mapper.Map<Request>(requestCreate);
+            var requestModel = requestDto.ToRequestFromCreateDto();
+            
+            await _requestRepository.CreateAsync(requestModel);
 
-            if(!_requestRepository.CreateRequest(requestMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Request successfully created");
+            return CreatedAtAction(nameof(GetById), new { id = requestModel.requestId }, requestModel.ToRequestDto());
         }
 
-        [HttpPut("{requestId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdateRequest(int requestId, [FromBody]RequestDto updatedRequest)
+        [HttpPut]
+        [Route("{requestId:int}")]
+        public async Task<IActionResult> Update([FromRoute] int requestId, [FromBody] UpdateRequestRequestDto updatedDto)
         {
-            if (updatedRequest == null)
-                return BadRequest(ModelState);
-
-            if (requestId != updatedRequest.RequestId)
-                return BadRequest(ModelState);
-
-            if (!_requestRepository.RequestExists(requestId))
-                return NotFound();
-
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var requestMap = _mapper.Map<Request>(updatedRequest);
-
-            if(!_requestRepository.UpdateRequest(requestMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating request");
-                return StatusCode(500, ModelState);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{requestId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteRequest(int requestId)
-        {
-            if(!_requestRepository.RequestExists(requestId))
+            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto);
+            
+            if(requestModel == null)
             {
                 return NotFound();
-            }
+            }            
 
-            var requestToDelete = _requestRepository.GetRequest(requestId);
+            return Ok(requestModel.ToRequestDto());
+        }
 
+        [HttpDelete]
+        [Route("{requestId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int requestId)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_requestRepository.DeleteRequest(requestToDelete))
+            var requestModel = await _requestRepository.DeleteAsync(requestId);
+
+            if (requestModel == null)
             {
-                ModelState.AddModelError("", "Something went wrong deleting request");
+                return NotFound();
             }
 
             return NoContent();

@@ -20,12 +20,12 @@ namespace API.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
-        private readonly ITransactionRepository _transactionRepo;
+        private readonly ITransactionRepository _transactionRepository;
 
-        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepo)
+        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepository)
         {
             _context = context;
-            _transactionRepo = transactionRepo;
+            _transactionRepository = transactionRepository;
         }
         
         [HttpGet]
@@ -35,11 +35,11 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var transactions = await _transactionRepo.GetAllAsync(query);
+            var transactions = await _transactionRepository.GetAllAsync(query);
             
             var transactionDto = transactions.Select(t => t.ToTransactionDto().ToList());
 
-            return Ok(transactions);
+            return Ok(transactionDto);
         }
 
         [HttpGet("{transactionId:int}")]        
@@ -49,7 +49,7 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);    
             
-            var transaction = await _transactionRepo.GetByIdAsync(transactionId);
+            var transaction = await _transactionRepository.GetByIdAsync(transactionId);
 
             if (transaction == null)
             {
@@ -60,16 +60,16 @@ namespace API.Controllers
         }      
 
         [HttpPost]        
-        public async Task<IActionResult> Create([FromBody] CreateTransactionRequestDto transactionDto)
+        public async Task<IActionResult> Create([FromBody] CreateTransactionDto transactionDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var transactionModel = transactionDto.ToTransactionFromCreateDTO();
+            var transactionModel = transactionDto.ToTransactionFromCreateDto();
             
-            await _transactionRepo.CreateAsync(transactionModel);
+            await _transactionRepository.CreateAsync(transactionModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = transactionModel.transactionId }, transactionModel.ToTransactionDto()));
+            return CreatedAtAction(nameof(GetById), new { id = transactionModel.transactionId }, transactionModel.ToTransactionDto());
         }
 
         [HttpPut]
@@ -79,7 +79,7 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var transactionModel = await _transactionRepo.UpdateAsync(transactionId, updatedDto);
+            var transactionModel = await _transactionRepository.UpdateAsync(transactionId, updatedDto);
             
             if(transactionModel == null)
             {
@@ -96,7 +96,7 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var transactionModel = await _transactionRepo.DeleteAsync(transactionId);
+            var transactionModel = await _transactionRepository.DeleteAsync(transactionId);
 
             if (transactionModel == null)
             {

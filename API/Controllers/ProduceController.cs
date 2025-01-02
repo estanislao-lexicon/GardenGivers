@@ -1,132 +1,106 @@
-using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using API.Dtos.Produce;
 using API.Interfaces;
 using API.Models;
+using API.Data;
+using API.Helper;
+using API.Mappers;
+
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProduceController : ControllerBase
+    public class OfferController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
         private readonly IProduceRepository _produceRepository;
-        private readonly IMapper _mapper;
 
-        public ProduceController(IProduceRepository produceRepository, IMapper mapper)
+        private ProduceController(ApplicationDBContext context, IProduceRepository produceRepository)
         {
+            _context = context;
             _produceRepository = produceRepository;
-            _mapper = mapper;
         }
-
+        
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Produce>))]
-        public IActionResult GetProduces()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            var produces = _mapper.Map<List<ProduceDto>>(_produceRepository.GetProduces());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(produces);
+            var produces = await _produceRepository.GetAllAsync(query);
+            
+            var produceDto = produces.Select(p => p.ToProduceDto().ToList());
+
+            return Ok(produceDto);
         }
 
-        [HttpGet("{produceId}")]
-        [ProducesResponseType(200, Type = typeof(Produce))]
-        [ProducesResponseType(400)]
-        public IActionResult GetProduce(int produceId)
+        [HttpGet("{produceId:int}")]        
+        public async Task<IActionResult> GetById([FromRoute] int produceId)
         {
-            if (!_produceRepository.ProduceExists(produceId))
-                return NotFound();
-
-            var produce = _mapper.Map<ProduceDto>(_produceRepository.GetProduce(produceId));
-
+            
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState);    
+            
+            var produce = await _produceRepository.GetByIdAsync(produceId);
 
-            return Ok(produce);
+            if (produce == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(produce.ToProduceDto());
         }      
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateProduce([FromBody] ProduceDto produceCreate)
+        [HttpPost]        
+        public async Task<IActionResult> Create([FromBody] CreateProduceDto produceDto)
         {
-            if (produceCreate == null)
-                return BadRequest(ModelState);
-
-            var produce = _produceRepository.GetProduces()
-                .Where(p => p.Name.Trim().ToUpper() == produceCreate.Name.TrimEnd().ToUpper())
-                .FirstOrDefault();
-
-            if(produce != null)
-            {
-                ModelState.AddModelError("", "Produce already exists");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var produceMap = _mapper.Map<Produce>(produceCreate);
+            var produceModel = produceDto.ToProduceFromCreateDto();
+            
+            await _produceRepository.CreateAsync(produceModel);
 
-            if(!_produceRepository.CreateProduce(produceMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Produce successfully created");
+            return CreatedAtAction(nameof(GetById), new { id = produceModel.produceId }, produceModel.ToProduceDto());
         }
 
-        [HttpPut("{produceId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult UpdatrProduce(int produceId, [FromBody]UserDto updatedProduce)
+        [HttpPut]
+        [Route("{produceId:int}")]
+        public async Task<IActionResult> Update([FromRoute] int produceId, [FromBody] UpdateProduceRequestDto produceDto)
         {
-            if (updatedProduce == null)
-                return BadRequest(ModelState);
-
-            if (produceId != updatedProduce.UserId)
-                return BadRequest(ModelState);
-
-            if (!_produceRepository.ProduceExists(produceId))
-                return NotFound();
-
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var produceMap = _mapper.Map<Produce>(updatedProduce);
-
-            if(!_produceRepository.UpdateProduce(produceMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating produce");
-                return StatusCode(500, ModelState);
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("{produceId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteProduce(int produceId)
-        {
-            if(!_produceRepository.ProduceExists(produceId))
+            var produceModel = await _produceRepository.UpdateAsync(produceId, updatedDto);
+            
+            if(produceModel == null)
             {
                 return NotFound();
-            }
+            }            
 
-            var produceToDelete = _produceRepository.GetProduce(produceId);
+            return Ok(produceModel.ToProduceDto());
+        }
 
+        [HttpDelete]
+        [Route("{produceId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int produceId)
+        {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_produceRepository.DeleteProduce(produceToDelete))
+            var produceModel = await _produceRepository.DeleteAsync(produceId);
+
+            if (produceModel == null)
             {
-                ModelState.AddModelError("", "Something went wrong deleting produce");
+                return NotFound();
             }
 
             return NoContent();

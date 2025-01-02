@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using API.Dto;
+using API.Dtos;
 using API.Models;
 
 namespace API.Helper

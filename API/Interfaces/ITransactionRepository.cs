@@ -11,8 +11,8 @@ namespace API.Interfaces
     public interface ITransactionRepository
     {
         Task<List<Transaction>> GetAllAsync();
-        Task<Transaction?> GetByIdAsync();
-        Task<Transaction?> CreateAsync(Transaction transactionModel);
+        Task<Transaction?> GetByIdAsync(int transactionId);
+        Task<Transaction> CreateAsync(Transaction transactionModel);
         Task<Transaction?> UpdateAsync(int transactionId, UpdateTransactionRequestDto transactionDto);
         Task<Transaction?> DeleteAsync (int transactionId);
         Task<bool> TransactionExists(int transactionId);
