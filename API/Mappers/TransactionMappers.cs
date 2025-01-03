@@ -21,14 +21,21 @@ namespace API.Mappers
             };
         }
 
-        public static Transaction ToTransactionFromCreateDTO(this CreateTransactionRequestDto transactionDto)
+        public static Transaction ToTransactionFromCreate(this CreateTransactionRequestDto transactionDto, int offerId, int requestId)
         {
             return new Transaction
             {
-                OfferId = transactionDto.OfferId,
-                RequestId = transactionDto.RequestId,
-                Quantity = transactionDto.Quantity,
-                TransactionDate = transactionDto.TransactionDate
+                OfferId = offerId,
+                RequestId = requestId,
+                Quantity = transactionDto.Quantity,                
+            };
+        }
+
+        public static Transaction ToTransactionFromUpdate(this UpdateTransactionRequestDto transactionDto)
+        {
+            return new Transaction
+            {
+                Quantity = transactionDto.Quantity,                
             };
         }
     }

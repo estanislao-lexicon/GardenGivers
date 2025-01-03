@@ -23,11 +23,15 @@ namespace API.Repository
 
         public async Task<List<Offer>> GetAllAsync(QueryObject query)
         {
-            return await _context.Offers.ToListAsync();
+            return await _context.Offers
+                .Include(t => t.Transactions)
+                .ToListAsync();
         }
         public async Task<Offer? > GetByIdAsync(int offerId)
         {
-            return await _context.Offers.FindAsync(offerId);
+            return await _context.Offers
+                .Include(t => t.Transactions)
+                .FindAsync(offerId);
         }
         public async Task<Offer> CreateAsync(Offer offerModel)
         {
@@ -41,10 +45,8 @@ namespace API.Repository
             var offerModel = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId = offerId);
             
             if(offerModel == null)
-            {
                 return null;
-            }
-
+            
             _context.Offers.Remove(offerModel);
             await _context.SaveChangesAsync();
             return offerModel;
@@ -56,17 +58,14 @@ namespace API.Repository
         }
         public async Task<Offer?> UpdateAsync (int offerId, UpdateOfferRequestDto offerDto)
         {
-            var existingOffer = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId == offerId);
+            var existingOffer = await _context.Offers.FindAsync(offerId);
 
             if(existingOffer == null)
-            {
                 return null;
-            }
-
+            
             existingOffer.Quantity = offerDto.Quantity;
             existingOffer.IsFree = offerDto.IsFree;
-            existingOffer.Price = offerDto.Price;
-            existingOffer.DateCreated = offerDto.DateCreated;
+            existingOffer.Price = offerDto.Price;            
             existingOffer.ExpirationDate = offerDto.ExpirationDate;
 
             await _context.SaveChangesAsync();

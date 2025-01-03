@@ -10,8 +10,8 @@ namespace API.Helper
         {
             CreateMap<Offer, OfferDto>();
             CreateMap<OfferDto, Offer>();
-            CreateMap<Produce, ProduceDto>();
-            CreateMap<ProduceDto, Produce>();
+            CreateMap<Product, ProductDto>();
+            CreateMap<ProductDto, Product>();
             CreateMap<Request, RequestDto>();
             CreateMap<RequestDto, Request>();
             CreateMap<Transaction, TransactionDto>();

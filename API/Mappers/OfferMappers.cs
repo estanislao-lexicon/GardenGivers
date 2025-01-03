@@ -15,25 +15,36 @@ namespace API.Mappers
             {
                 OfferId = offerModel.UserId,
                 UserId = offerModel.UserId,
-                ProduceId = offerModel.ProduceId,
+                productId = offerModel.productId,
                 Quantity = offerModel.Quantity,
                 IsFree = offerModel.IsFree,
-                Price = offerModel.Price,                
+                Price = offerModel.Price,
                 DateCreated = offerModel.DateCreated,
+                ExpirationDate = offerModel.ExpirationDate,
             };
         }
 
-        public static Offer ToOfferFromCreateDTO(this CreateOfferRequestDto offerDto)
+        public static Offer ToOfferFromCreate(this CreateOfferRequestDto offerDto, int userId, int productId)
         {
             return new Offer
             {
-                OfferId = offerDto.UserId,
-                UserId = offerDto.UserId,
-                ProduceId = offerDto.ProduceId,
+                UserId = userId,
+                ProductId = productId,
                 Quantity = offerDto.Quantity,
                 IsFree = offerDto.IsFree,
-                Price = offerDto.Price,                
-                DateCreated = offerDto.DateCreated,             
+                Price = offerDto.Price,
+                ExpirationDate = offerDto.ExpirationDate,
+            };
+        }
+
+        public static Offer ToOfferFromUpdate(this UpdateOfferRequestDto offerDto)
+        {
+            return new Offer
+            {                
+                Quantity = offerDto.Quantity,
+                IsFree = offerDto.IsFree,
+                Price = offerDto.Price,
+                ExpirationDate = offerDto.ExpirationDate,
             };
         }
     }

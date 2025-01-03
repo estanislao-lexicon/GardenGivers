@@ -13,7 +13,7 @@ namespace API.Interfaces
         Task<List<Request>> GetAllAsync();
         Task<Request?> GetByIdAsync(int requestId);
         Task<Request> CreateAsync(Request requestModel);
-        Task<Request?> UpdateAsync(int requestId, UpdateRequestRequestDto requestDto);
+        Task<Request?> UpdateAsync(int requestId, Request requestModel);
         Task<Request?> DeleteAsync (int requestId);
         Task<bool> RequestExists(int requestId);
     }

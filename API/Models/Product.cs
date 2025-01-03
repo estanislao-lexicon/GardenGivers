@@ -1,8 +1,8 @@
 ﻿namespace API.Models
 {
-    public class Produce
+    public class Product
     {
-        public int ProduceId { get; set; }
+        public int ProductId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }        
         public ICollection<Offer> Offers { get; set; }

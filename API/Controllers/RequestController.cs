@@ -21,11 +21,15 @@ namespace API.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly IRequestRepository _requestRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IProductRepository _productRepository;
 
-        private RequestController(ApplicationDBContext context, IRequestRepository requestRepository)
+        private RequestController(ApplicationDBContext context, IRequestRepository requestRepository, IUserRepository userRepository, IProductRepository productRepository)
         {
             _context = context;
             _requestRepository = requestRepository;
+            _userRepository = userRepository;
+            _productRepository = productRepository;
         }
         
         [HttpGet]
@@ -59,13 +63,20 @@ namespace API.Controllers
             return Ok(request.ToRequestDto());
         }      
 
-        [HttpPost]        
-        public async Task<IActionResult> Create([FromBody] CreateRequestDto requestDto)
+        [HttpPost]
+        [Route("{userId:int, productId:int }")]      
+        public async Task<IActionResult> Create([FromRoute] int userId, int productId, CreateRequestDto requestDto)
         {
+            if(!await _userRepository.UserExist(userId))
+                return BadRequest("User does not exist");
+            
+            if(!await _productRepository.ProductExist(productId))
+                return BadRequest("Product does not exist");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var requestModel = requestDto.ToRequestFromCreateDto();
+            var requestModel = requestDto.ToRequestFromCreateDto(userId, productId);
             
             await _requestRepository.CreateAsync(requestModel);
 
@@ -79,11 +90,11 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto);
+            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToOfferFromUpdate());
             
             if(requestModel == null)
             {
-                return NotFound();
+                return NotFound("Request not found");
             }            
 
             return Ok(requestModel.ToRequestDto());

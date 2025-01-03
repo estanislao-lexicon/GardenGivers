@@ -2,8 +2,8 @@
 erDiagram
     Users {
         int UserId PK
-        string FirstName // StringLength(50)
-        string LastName
+        string FirstName // Required StringLength(50)
+        string LastName // Required StringLength(50)
         string Email // Required
         string PasswordHash // Required
         string Address
@@ -12,8 +12,8 @@ erDiagram
         datetime DateCreated
     }
 
-    Produce {
-        int ProduceId PK
+    Product {
+        int ProductId PK
         string Name // StringLength(50)
         string Description
     }
@@ -21,9 +21,9 @@ erDiagram
     Offers {
         int OfferId PK
         int UserId FK
-        int ProduceId FK
-        decimal Quantity
-        boolean IsFree
+        int ProductId FK
+        decimal Quantity // Required
+        boolean IsFree // Required
         decimal Price
         datetime DateCreated
         datetime ExpirationDate
@@ -32,8 +32,8 @@ erDiagram
     Requests {
         int RequestId PK
         int UserId FK
-        int ProduceId FK
-        decimal Quantity
+        int ProductId FK
+        decimal Quantity // Required
         datetime DateCreated
     }
 
@@ -41,14 +41,14 @@ erDiagram
         int TransactionId PK
         int OfferId FK
         int RequestId FK
-        decimal Quantity
+        decimal Quantity // Required
         datetime TransactionDate
     }
     
     Users ||--o{ Offers : "1-to-many"
     Users ||--o{ Requests : "1-to-many"
-    Produce ||--o{ Offers : "1-to-many"
-    Produce ||--o{ Requests : "1-to-many"
+    Product ||--o{ Offers : "1-to-many"
+    Product ||--o{ Requests : "1-to-many"
     Offers ||--o{ Transactions : "1-to-many"
     Requests ||--o{ Transactions : "1-to-many"
 

@@ -7,9 +7,6 @@ namespace API.Dtos.Transaction
 {
     public class UpdateTransactionRequestDto
     {        
-        public int OfferId { get; set; }
-        public int RequestId { get; set; }
-        public decimal Quantity { get; set; }
-        public DateTime TransactionDate { get; set; }
+        public decimal Quantity { get; set; }        
     }
 }

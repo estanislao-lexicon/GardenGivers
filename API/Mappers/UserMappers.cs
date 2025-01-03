@@ -22,6 +22,8 @@ namespace API.Mappers
                 Address = userModel.Address,
                 PostNumber = userModel.PostNumber,
                 DateCreated = userModel.DateCreated,
+                Offers = userModel.Offers,
+                Requests = userModel.Requests,
             };
         }
 
@@ -37,7 +39,9 @@ namespace API.Mappers
                 City = userDto.City,
                 Address = userDto.Address,
                 PostNumber = userDto.PostNumber,
-                DateCreated = userDto.DateCreated,                
+                DateCreated = userDto.DateCreated,
+                Offers = userDto.Offers,
+                Requests = userDto.Requests,           
             };
         }
     }

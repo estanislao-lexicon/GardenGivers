@@ -53,13 +53,11 @@ namespace API.Repository
         }
         public async Task<Transaction?> UpdateAsync (int transactionId, UpdateTransactionRequestDto transactionDto)
         {
-            var existingTransaction = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == transactionId);
+            var existingTransaction = await _context.Transactions.AnyAsync(transactionId);
 
             if(existingTransaction == null)
-            {
                 return null;
-            }
-
+            
             existingTransaction.Quantity = transactionDto.Quantity;
 
             await _context.SaveChangesAsync();

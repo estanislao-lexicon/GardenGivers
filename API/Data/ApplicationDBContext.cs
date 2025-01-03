@@ -11,7 +11,7 @@ namespace API.Data
         }
 
         public DbSet<Offer> Offers { get; set; }
-        public DbSet<Produce> Produces { get; set; }
+        public DbSet<product> products { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Transaction> Transactions  { get; set; }
         public DbSet<User> Users { get; set; }

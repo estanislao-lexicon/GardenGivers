@@ -21,11 +21,15 @@ namespace API.Repository
         }
         public async Task<List<Request>> GetAllAsync(QueryObject query)
         {
-            return await _context.Requests.ToListAsync();
+            return await _context.Requests
+                .Include(t => t.Transactions)
+                .ToListAsync();
         }
         public async Task<Request?> GetByIdAsync(int requestId)
         {
-            return await _context.Requests.Include(r => r.requestId).FirstOrDefaultAsync(i => i.RequestId == requestId);
+            return await _context.Requests
+                .Include(t => t.Transactions)
+                .FirstOrDefaultAsync(i => i.RequestId == requestId);
         }
         public async Task<Request> CreateAsync(Request requestModel)
         {
@@ -54,15 +58,12 @@ namespace API.Repository
         }
         public async Task<Request?> UpdateAsync (int requestId, UpdateRequestRequestDto requestDto)
         {
-            var existingRequest = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == requestId);
+            var existingRequest = await _context.Requests.AnyAsync(requestId);
 
             if(existingRequest == null)
-            {
                 return null;
-            }
-
-            existingRequest.Quantity = requestDto.Quantity;
-            existingRequest.DateCreated = requestDto.DateCreated;
+            
+            existingRequest.Quantity = requestDto.Quantity;            
 
             await _context.SaveChangesAsync();
             return existingRequest;

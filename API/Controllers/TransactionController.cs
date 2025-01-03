@@ -21,11 +21,15 @@ namespace API.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IOfferRepository _offerRepository;
+        private readonly IRequestRepository _requestRepository;
 
-        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepository)
+        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepository, IOfferRepository offerRepository, IRequestRepository requestRepository)
         {
             _context = context;
             _transactionRepository = transactionRepository;
+            _offerRepository = offerRepository;
+            _requestRepository = requestRepository;
         }
         
         [HttpGet]
@@ -59,13 +63,20 @@ namespace API.Controllers
             return Ok(transaction.ToTransactionDto());
         }      
 
-        [HttpPost]        
-        public async Task<IActionResult> Create([FromBody] CreateTransactionDto transactionDto)
+        [HttpPost]
+        [Route("{offerId:int, requestId:int}")]
+        public async Task<IActionResult> Create([FromRoute] int offerId, int requestId, CreateTransactionDto transactionDto)
         {
+            if(!await _offerRepository.OfferExist(offerId))
+                return BadRequest("Offer does not exist");
+            
+            if(!await _requestRepository.RequestExist(requestId))
+                return BadRequest("Request does not exist");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var transactionModel = transactionDto.ToTransactionFromCreateDto();
+            var transactionModel = transactionDto.ToTransactionFromCreateDto(offerId, requestId);
             
             await _transactionRepository.CreateAsync(transactionModel);
 
@@ -73,17 +84,17 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Route("{transactionId:int}")]        
+        [Route("{transactionId:int}")]
         public async Task<IActionResult> Update([FromRoute] int transactionId, [FromBody] UpdateTransactionRequestDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var transactionModel = await _transactionRepository.UpdateAsync(transactionId, updatedDto);
+            var transactionModel = await _transactionRepository.UpdateAsync(transactionId, updatedDto.ToTransactionFromUpdate());
             
             if(transactionModel == null)
             {
-                return NotFound();
+                return NotFound("Transaction not found");
             }            
 
             return Ok(transactionModel.ToTransactionDto());

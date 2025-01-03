@@ -21,11 +21,17 @@ namespace API.Repository
         }
         public async Task<List<User>> GetAllAsync(QueryObject query)
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users
+                .Include(o => o.Offers)
+                .Include(r => r.Requests)
+                .ToListAsync();
         }
         public async Task<User?> GetByIdAsync(int userId)
         {
-            return await _context.Users.Include(u => u.userId).FirstOrDefaultAsync(i => i.UserId == userId);
+            return await _context.Users                
+                .Include(o => o.Offers)
+                .Include(r => r.Requests)
+                .FirstOrDefaultAsync(i => i.UserId == userId);
         }
         public async Task<User> CreateAsync(User userModel)
         {
@@ -36,7 +42,8 @@ namespace API.Repository
 
         public async Task<User?> DeleteAsync (int userId)
         {
-            var userModel = await _context.Users.FirstOrDefaultAsync(u => u.UserId = userId);
+            var userModel = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId = userId);
             
             if(userModel == null)
             {
@@ -50,24 +57,23 @@ namespace API.Repository
 
         public Task<bool> UserExists(int userId)
         { 
-            return _context.Users.AnyAsync(u => u.UserId == userId);
+            return _context.Users
+                .AnyAsync(u => u.UserId == userId);
         }
         public async Task<User?> UpdateAsync (int userId, UpdateUserRequestDto userDto)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            var existingUser = await _context.Users.AnyAsync(userId);
 
             if(existingUser == null)
-            {
                 return null;
-            }
-
+            
             existingUser.FirstName = userDto.FirstName;
             existingUser.LastName = userDto.LastName;
             existingUser.Email = userDto.Email;
-            existingUser.City = userDto.City;
+            existingUser.PasswordHash = userDto.PasswordHash;
             existingUser.Address = userDto.Address;
+            existingUser.City = userDto.City;
             existingUser.PostNumber = userDto.PostNumber;
-            existingUser.DateCreated = userDto.DateCreated;            
 
             await _context.SaveChangesAsync();
             return existingUser;

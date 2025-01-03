@@ -15,21 +15,30 @@ namespace API.Mappers
             {
                 RequestId = requestModel.RequestId,
                 UserId = requestModel.UserId,
-                ProduceId = requestModel.ProduceId,
+                ProductId = requestModel.ProductId,
                 Quantity = requestModel.Quantity,
-                DateCreated = requestModel.DateCreated,    
+                DateCreated = requestModel.DateCreated,
+                Transactions = requestModel.Transactions,
             };
         }
 
-        public static Request ToRequestFromCreateDTO(this CreateRequestRequestDto requestDto)
+        public static Request ToRequestFromCreate(this CreateRequestRequestDto requestDto, int userId, int productId)
         {
             return new Request
             {
-                RequestId = requestDto.RequestId,
-                UserId = requestDto.UserId,
-                ProduceId = requestDto.ProduceId,
-                Quantity = requestDto.Quantity,
-                DateCreated = requestDto.DateCreated,
+                UserId = userId,
+                ProductId = productId,
+                Quantity = requestDto.Quantity,                
+                Transactions = requestDto.Transactions,
+            };
+        }
+
+        public static Request ToRequestFromUpdate(this UpdateRequestRequestDto requestDto)
+        {
+            return new Request
+            {
+                Quantity = requestDto.Quantity,                
+                Transactions = requestDto.Transactions,
             };
         }
     }
