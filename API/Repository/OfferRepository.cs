@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFramworkCore;
+using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
@@ -16,22 +16,37 @@ namespace API.Repository
     {
         private readonly ApplicationDbContext _context;
 
-        public OfferRepository(ApplicationDBContext context)
+        public OfferRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Offer>> GetAllAsync(QueryObject query)
+        public async Task<List<Offer>> GetAllAsync(OfferQueryObject query)
         {
-            return await _context.Offers
+            var offers = _context.Offers
                 .Include(t => t.Transactions)
-                .ToListAsync();
+                .AsQueryable();
+            
+            if(query.Quantity  != null)
+            {
+                offers = offers.Where(o => o.Quantity == query.Quantity);
+            }
+            if(query.IsFree != null)
+            {
+                offers = offers.Where(o => o.IsFree == query.IsFree);
+            }
+            if(query.Price != null)
+            {
+                offers = offers.Where(o => o.Price == query.Price);
+            }            
+
+            return await offers.ToListAsync();
         }
         public async Task<Offer? > GetByIdAsync(int offerId)
         {
             return await _context.Offers
                 .Include(t => t.Transactions)
-                .FindAsync(offerId);
+                .FirstOrDefaultAsync(o => o.OfferId == offerId);
         }
         public async Task<Offer> CreateAsync(Offer offerModel)
         {
@@ -42,7 +57,7 @@ namespace API.Repository
 
         public async Task<Offer?> DeleteAsync (int offerId)
         {
-            var offerModel = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId = offerId);
+            var offerModel = await _context.Offers.FirstOrDefaultAsync(o => o.OfferId == offerId);
             
             if(offerModel == null)
                 return null;
@@ -52,21 +67,22 @@ namespace API.Repository
             return offerModel;
         }
 
-        public Task<bool> OfferExists(int offerId)
+        public Task<bool> OfferExist(int offerId)
         { 
             return _context.Offers.AnyAsync(o => o.OfferId == offerId);
         }
-        public async Task<Offer?> UpdateAsync (int offerId, UpdateOfferRequestDto offerDto)
+        
+        public async Task<Offer?> UpdateAsync (int offerId, Offer offerModel)
         {
             var existingOffer = await _context.Offers.FindAsync(offerId);
 
             if(existingOffer == null)
                 return null;
             
-            existingOffer.Quantity = offerDto.Quantity;
-            existingOffer.IsFree = offerDto.IsFree;
-            existingOffer.Price = offerDto.Price;            
-            existingOffer.ExpirationDate = offerDto.ExpirationDate;
+            existingOffer.Quantity = offerModel.Quantity;
+            existingOffer.IsFree = offerModel.IsFree;
+            existingOffer.Price = offerModel.Price;            
+            existingOffer.ExpirationDate = offerModel.ExpirationDate;
 
             await _context.SaveChangesAsync();
             return existingOffer;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace API.Dtos.Request
 {
-    public class UpdateRequestRequestDto
+    public class UpdateRequestDto
     {
         public decimal Quantity { get; set; }        
     }

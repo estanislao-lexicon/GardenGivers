@@ -4,6 +4,7 @@ using API;
 using API.Data;
 using API.Interfaces;
 using API.Repository;
+using Newtonsoft.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +17,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
  });
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();

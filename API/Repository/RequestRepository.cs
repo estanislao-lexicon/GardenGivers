@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFramworkCore;
+using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
@@ -13,17 +13,24 @@ namespace API.Repository
 {
     public class RequestRepository : IRequestRepository
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public RequestRepository(ApplicationDBContext context)
+        public RequestRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<List<Request>> GetAllAsync(QueryObject query)
+        public async Task<List<Request>> GetAllAsync(RequestQueryObject query)
         {
-            return await _context.Requests
+            var requests = _context.Requests
                 .Include(t => t.Transactions)
-                .ToListAsync();
+                .AsQueryable();
+            
+            if(query.Quantity != null)
+            {
+                requests = requests.Where(r => r.Quantity == query.Quantity);
+            }
+
+            return await requests.ToListAsync();
         }
         public async Task<Request?> GetByIdAsync(int requestId)
         {
@@ -40,7 +47,7 @@ namespace API.Repository
 
         public async Task<Request?> DeleteAsync (int requestId)
         {
-            var requestModel = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId = requestId);
+            var requestModel = await _context.Requests.FirstOrDefaultAsync(r => r.RequestId == requestId);
             
             if(requestModel == null)
             {
@@ -52,18 +59,18 @@ namespace API.Repository
             return requestModel;
         }
 
-        public Task<bool> RequestExists(int requestId)
+        public Task<bool> RequestExist(int requestId)
         { 
             return _context.Requests.AnyAsync(r => r.RequestId == requestId);
         }
-        public async Task<Request?> UpdateAsync (int requestId, UpdateRequestRequestDto requestDto)
+        public async Task<Request?> UpdateAsync (int requestId, Request requestModel)
         {
-            var existingRequest = await _context.Requests.AnyAsync(requestId);
+            var existingRequest = await _context.Requests.FindAsync(requestId);
 
             if(existingRequest == null)
                 return null;
             
-            existingRequest.Quantity = requestDto.Quantity;            
+            existingRequest.Quantity = requestModel.Quantity;            
 
             await _context.SaveChangesAsync();
             return existingRequest;

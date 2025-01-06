@@ -9,7 +9,7 @@ using API.Dtos.User;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Helper;
+using API.Helpers;
 using API.Mappers;
 
 
@@ -19,10 +19,10 @@ namespace API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;    
+        private readonly ApplicationDbContext _context;    
         private readonly IUserRepository _userRepository;        
 
-        public UserController(ApplicationDBContext context, IUserRepository userRepository)
+        public UserController(ApplicationDbContext context, IUserRepository userRepository)
         {
             _context = context;
             _userRepository = userRepository;            
@@ -30,13 +30,13 @@ namespace API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] QuestyObject query)
+        public async Task<IActionResult> GetAll()
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var users = await _userRepository.GetAllAsync(query);
-            var userDto = users.Select(u => u.ToUserDto().ToList());
+            var users = await _userRepository.GetAllAsync();
+            var userDto = users.Select(u => u.ToUserDto());
 
             return Ok(userDto);
         }
@@ -64,11 +64,11 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userModel = userDto.ToUserFromCreateDto();
+            var userModel = userDto.ToUserFromCreate();
 
             await _userRepository.CreateAsync(userModel);
 
-            return CreateAtAction(nameof(GetById), new { id = userModel.userId }, userModel.ToUserDto());
+            return CreatedAtAction(nameof(GetById), new { id = userModel.UserId }, userModel.ToUserDto());
         }
 
         [HttpPut]

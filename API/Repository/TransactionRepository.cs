@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFramworkCore;
+using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
@@ -13,18 +13,25 @@ namespace API.Repository
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly ApplicationDBContext _context;
-        public TransactionRepository(ApplicationDBContext context)
+        private readonly ApplicationDbContext _context;
+        public TransactionRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<List<Transaction>> GetAllAsync(QueryObject query)
+        public async Task<List<Transaction>> GetAllAsync(TransactionQueryObject query)
         {
-            return await _context.Transactions.ToListAsync();
+            var transactions = _context.Transactions.AsQueryable();
+
+            if(query.Quantity != null)
+            {
+                transactions = transactions.Where(t => t.Quantity == query.Quantity);
+            }
+
+            return await transactions.ToListAsync();
         }
         public async Task<Transaction?> GetByIdAsync(int transactionId)
         {
-            return await _context.Transactions.Include(t => t.transactionId).FirstOrDefaultAsync(i => i.TransactionId == transactionId);
+            return await _context.Transactions.Include(t => t.TransactionId).FirstOrDefaultAsync(i => i.TransactionId == transactionId);
         }
         public async Task<Transaction> CreateAsync(Transaction transactionModel)
         {
@@ -35,7 +42,7 @@ namespace API.Repository
 
         public async Task<Transaction?> DeleteAsync (int transactionId)
         {
-            var transactionModel = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId = transactionId);
+            var transactionModel = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionId == transactionId);
             
             if(transactionModel == null)
             {
@@ -47,18 +54,19 @@ namespace API.Repository
             return transactionModel;
         }
 
-        public Task<bool> TransactionExists(int transactionId)
+        public Task<bool> TransactionExist(int transactionId)
         { 
             return _context.Transactions.AnyAsync(t => t.TransactionId == transactionId);
         }
-        public async Task<Transaction?> UpdateAsync (int transactionId, UpdateTransactionRequestDto transactionDto)
+        
+        public async Task<Transaction?> UpdateAsync (int transactionId, Transaction transactionModel)
         {
-            var existingTransaction = await _context.Transactions.AnyAsync(transactionId);
+            var existingTransaction = await _context.Transactions.FindAsync(transactionId);
 
             if(existingTransaction == null)
                 return null;
             
-            existingTransaction.Quantity = transactionDto.Quantity;
+            existingTransaction.Quantity = transactionModel.Quantity;
 
             await _context.SaveChangesAsync();
             return existingTransaction;

@@ -9,7 +9,7 @@ using API.Dtos.Transaction;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Helper;
+using API.Helpers;
 using API.Mappers;
 
 
@@ -19,12 +19,12 @@ namespace API.Controllers
     [ApiController]
     public class TransactionController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IOfferRepository _offerRepository;
         private readonly IRequestRepository _requestRepository;
 
-        private TransactionController(ApplicationDBContext context, ITransactionRepository transactionRepository, IOfferRepository offerRepository, IRequestRepository requestRepository)
+        private TransactionController(ApplicationDbContext context, ITransactionRepository transactionRepository, IOfferRepository offerRepository, IRequestRepository requestRepository)
         {
             _context = context;
             _transactionRepository = transactionRepository;
@@ -34,22 +34,21 @@ namespace API.Controllers
         
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        public async Task<IActionResult> GetAll([FromQuery] TransactionQueryObject query)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var transactions = await _transactionRepository.GetAllAsync(query);
             
-            var transactionDto = transactions.Select(t => t.ToTransactionDto().ToList());
+            var transactionDto = transactions.Select(t => t.ToTransactionDto()).ToList();
 
             return Ok(transactionDto);
         }
 
         [HttpGet("{transactionId:int}")]        
         public async Task<IActionResult> GetById([FromRoute] int transactionId)
-        {
-            
+        {            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);    
             
@@ -67,20 +66,20 @@ namespace API.Controllers
         [Route("{offerId:int, requestId:int}")]
         public async Task<IActionResult> Create([FromRoute] int offerId, int requestId, CreateTransactionDto transactionDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if(!await _offerRepository.OfferExist(offerId))
                 return BadRequest("Offer does not exist");
             
             if(!await _requestRepository.RequestExist(requestId))
                 return BadRequest("Request does not exist");
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var transactionModel = transactionDto.ToTransactionFromCreateDto(offerId, requestId);
+            var transactionModel = transactionDto.ToTransactionFromCreate(offerId, requestId);
             
             await _transactionRepository.CreateAsync(transactionModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = transactionModel.transactionId }, transactionModel.ToTransactionDto());
+            return CreatedAtAction(nameof(GetById), new { id = transactionModel.TransactionId }, transactionModel.ToTransactionDto());
         }
 
         [HttpPut]

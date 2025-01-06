@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using API.Dtos.Request;
+using API.Dtos.Offer;
 
 namespace API.Models
 {
@@ -23,7 +25,7 @@ namespace API.Models
         [Required]
         public string PostNumber { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-        public ICollection<Offer> Offers { get; set; }
-        public ICollection<Request> Requests { get; set; }        
+        public List<Offer> Offers { get; set; }
+        public List<Request> Requests { get; set; }        
     }
 }

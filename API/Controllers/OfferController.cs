@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using API.Dtos.Offer;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Helper;
+using API.Helpers;
 using API.Mappers;
 
 
@@ -19,12 +20,12 @@ namespace API.Controllers
     [ApiController]
     public class OfferController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IOfferRepository _offerRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProductRepository _productRepository;
 
-        private OfferController(ApplicationDBContext context, IOfferRepository offerRepository, IUserRepository userRepository, IProductRepository productRepository)
+        private OfferController(ApplicationDbContext context, IOfferRepository offerRepository, IUserRepository userRepository, IProductRepository productRepository)
         {
             _context = context;
             _offerRepository = offerRepository;
@@ -34,22 +35,21 @@ namespace API.Controllers
         
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        public async Task<IActionResult> GetAll([FromQuery] OfferQueryObject query)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var offers = await _offerRepository.GetAllAsync(query);
             
-            var offerDto = offers.Select(o => o.ToOfferDto().ToList());
+            var offerDto = offers.Select(o => o.ToOfferDto());
 
             return Ok(offerDto);
         }
 
         [HttpGet("{offerId:int}")]        
         public async Task<IActionResult> GetById([FromRoute] int offerId)
-        {
-            
+        {            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);    
             
@@ -67,20 +67,20 @@ namespace API.Controllers
         [Route("{userdId:int, productId:int}")]  
         public async Task<IActionResult> Create([FromRoute] int userId, int productId, CreateOfferDto offerDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);  
+
             if(!await _userRepository.UserExist(userId))
                 return BadRequest("User does not exist");
             
             if(!await _productRepository.ProductExist(productId))
                 return BadRequest("Product does not exist");
-            
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var offerModel = offerDto.ToOfferFromCreateDto(userId, productId);
+            var offerModel = offerDto.ToOfferFromCreate(userId, productId);
             
             await _offerRepository.CreateAsync(offerModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = offerModel.offerId }, offerModel.ToOfferDto());
+            return CreatedAtAction(nameof(GetById), new { id = offerModel.OfferId }, offerModel.ToOfferDto());
         }
 
         [HttpPut]

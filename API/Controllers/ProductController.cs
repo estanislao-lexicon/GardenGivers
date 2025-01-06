@@ -9,7 +9,7 @@ using API.Dtos.Product;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Helper;
+using API.Helpers;
 using API.Mappers;
 
 
@@ -17,86 +17,85 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OfferController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
-        private readonly IProductRepository _ProductRepository;
+        private readonly ApplicationDbContext _context;
+        private readonly IProductRepository _productRepository;
 
-        private ProductController(ApplicationDBContext context, IProductRepository ProductRepository)
+        private ProductController(ApplicationDbContext context, IProductRepository productRepository)
         {
             _context = context;
-            _ProductRepository = ProductRepository;
+            _productRepository = productRepository;
         }
         
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
+        public async Task<IActionResult> GetAll([FromQuery] ProductQueryObject query)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var Products = await _ProductRepository.GetAllAsync(query);
+            var products = await _productRepository.GetAllAsync(query);
             
-            var ProductDto = Products.Select(p => p.ToProductDto().ToList());
+            var productDto = products.Select(p => p.ToProductDto());
 
-            return Ok(ProductDto);
+            return Ok(productDto);
         }
 
-        [HttpGet("{ProductId:int}")]        
-        public async Task<IActionResult> GetById([FromRoute] int ProductId)
-        {
-            
+        [HttpGet("{productId:int}")]        
+        public async Task<IActionResult> GetById([FromRoute] int productId)
+        {            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);    
             
-            var Product = await _ProductRepository.GetByIdAsync(ProductId);
+            var product = await _productRepository.GetByIdAsync(productId);
 
-            if (Product == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return Ok(Product.ToProductDto());
+            return Ok(product.ToProductDto());
         }      
 
         [HttpPost]        
-        public async Task<IActionResult> Create([FromBody] CreateProductDto ProductDto)
+        public async Task<IActionResult> Create([FromBody] CreateProductDto productDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ProductModel = ProductDto.ToProductFromCreateDto();
+            var productModel = productDto.ToProductFromCreate();
             
-            await _ProductRepository.CreateAsync(ProductModel);
+            await _productRepository.CreateAsync(productModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = ProductModel.ProductId }, ProductModel.ToProductDto());
+            return CreatedAtAction(nameof(GetById), new { id = productModel.ProductId }, productModel.ToProductDto());
         }
 
         [HttpPut]
-        [Route("{ProductId:int}")]
-        public async Task<IActionResult> Update([FromRoute] int ProductId, [FromBody] UpdateProductRequestDto ProductDto)
+        [Route("{productId:int}")]
+        public async Task<IActionResult> Update([FromRoute] int productId, [FromBody] UpdateProductRequestDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var ProductModel = await _ProductRepository.UpdateAsync(ProductId, updatedDto);
+            var productModel = await _productRepository.UpdateAsync(productId, updatedDto);
             
-            if(ProductModel == null)
+            if(productModel == null)
                 return NotFound();
             
-            return Ok(ProductModel.ToProductDto());
+            return Ok(productModel.ToProductDto());
         }
 
         [HttpDelete]
-        [Route("{ProductId:int}")]
-        public async Task<IActionResult> Delete([FromRoute] int ProductId)
+        [Route("{productId:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int productId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ProductModel = await _ProductRepository.DeleteAsync(ProductId);
+            var productModel = await _productRepository.DeleteAsync(productId);
 
-            if (ProductModel == null)
+            if (productModel == null)
             {
                 return NotFound();
             }

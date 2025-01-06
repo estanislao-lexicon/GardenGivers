@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Task;
+using System.Threading;
 using API.Models;
 using API.Dtos.Offer;
 
@@ -13,9 +13,9 @@ namespace API.Mappers
         {
             return new OfferDto
             {
-                OfferId = offerModel.UserId,
+                OfferId = offerModel.OfferId,
                 UserId = offerModel.UserId,
-                productId = offerModel.productId,
+                ProductId = offerModel.ProductId,
                 Quantity = offerModel.Quantity,
                 IsFree = offerModel.IsFree,
                 Price = offerModel.Price,
@@ -24,7 +24,7 @@ namespace API.Mappers
             };
         }
 
-        public static Offer ToOfferFromCreate(this CreateOfferRequestDto offerDto, int userId, int productId)
+        public static Offer ToOfferFromCreate(this CreateOfferDto offerDto, int userId, int productId)
         {
             return new Offer
             {

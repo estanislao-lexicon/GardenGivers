@@ -3,15 +3,15 @@ using API.Models;
 
 namespace API.Data
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
-        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
             
         }
 
         public DbSet<Offer> Offers { get; set; }
-        public DbSet<product> products { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Transaction> Transactions  { get; set; }
         public DbSet<User> Users { get; set; }

@@ -15,6 +15,6 @@ namespace API.Interfaces
         Task<User> CreateAsync(User userModel);
         Task<User?> UpdateAsync(int userId, UpdateUserRequestDto userDto);
         Task<User?> DeleteAsync (int userId);
-        Task<bool> UserExists(int userId);
+        Task<bool> UserExist(int userId);
     }
 }

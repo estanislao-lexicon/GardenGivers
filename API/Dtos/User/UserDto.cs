@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Dtos.Offer;
+using API.Dtos.Request;
 
 namespace API.Dtos.User
 {

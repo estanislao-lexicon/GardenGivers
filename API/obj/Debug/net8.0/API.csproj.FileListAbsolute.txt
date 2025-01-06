@@ -13,7 +13,6 @@
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/API.runtimeconfig.json
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/API.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/API.pdb
-/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/AutoMapper.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.OpenApi.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
@@ -169,3 +168,7 @@
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.AspNetCore.JsonPatch.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Newtonsoft.Json.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Newtonsoft.Json.Bson.dll

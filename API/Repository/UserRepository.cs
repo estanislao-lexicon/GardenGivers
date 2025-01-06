@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFramworkCore;
+using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
@@ -13,13 +13,13 @@ namespace API.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public UserRepository(ApplicationDBContext context)
+        public UserRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<List<User>> GetAllAsync(QueryObject query)
+        public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users
                 .Include(o => o.Offers)
@@ -43,26 +43,26 @@ namespace API.Repository
         public async Task<User?> DeleteAsync (int userId)
         {
             var userModel = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId = userId);
+                .FirstOrDefaultAsync(u => u.UserId == userId);
             
             if(userModel == null)
             {
                 return null;
             }
 
-            _context.User.Remove(userModel);
+            _context.Users.Remove(userModel);
             await _context.SaveChangesAsync();
             return userModel;
         }
 
-        public Task<bool> UserExists(int userId)
+        public Task<bool> UserExist(int userId)
         { 
             return _context.Users
                 .AnyAsync(u => u.UserId == userId);
         }
         public async Task<User?> UpdateAsync (int userId, UpdateUserRequestDto userDto)
         {
-            var existingUser = await _context.Users.AnyAsync(userId);
+            var existingUser = await _context.Users.FindAsync(userId);
 
             if(existingUser == null)
                 return null;

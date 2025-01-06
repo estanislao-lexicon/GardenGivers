@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Task;
+using System.Threading;
 using API.Models;
 using API.Dtos.Product;
 
@@ -9,27 +9,24 @@ namespace API.Mappers
 {
     public static class ProductMappers
     {
-        public static ProductDto ToProductDto(this Product ProductModel)
+        public static ProductDto ToProductDto(this Product productModel)
         {
             return new ProductDto
             {
-                ProductId = ProductModel.ProductId,
-                Name = ProductModel.Name,
-                Description = ProductModel.Description,
-                Offers = ProductModel.Offers,
-                Requests = ProductModel.Requests,              
+                ProductId = productModel.ProductId,
+                Name = productModel.Name,
+                Description = productModel.Description,
+                Offers = productModel.Offers.Select(o => o.ToOfferDto()).ToList(),
+                Requests = productModel.Requests.Select(r => r.ToRequestDto()).ToList(),
             };
         }
 
-        public static Product ToProductFromCreateDTO(this CreateProductRequestDto ProductDto)
+        public static Product ToProductFromCreate(this CreateProductDto productDto)
         {
             return new Product
             {
-                ProductId = ProductDto.ProductId,
-                Name = ProductDto.Name,
-                Description = ProductDto.Description,
-                Offers = ProductDto.Offers,
-                Requests = ProductDto.Requests,             
+                Name = productDto.Name,
+                Description = productDto.Description,                
             };
         }
     }
