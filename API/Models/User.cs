@@ -1,24 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Models
 {
-    public class User
-    {
-        public int UserId { get; set; }
+    public class User : IdentityUser
+    {     
         [StringLength(50)]
         public required string FirstName { get; set; }
         [StringLength(50)]
         public required string LastName { get; set; }
-        [EmailAddress]
-        public required string Email { get; set; }
-        public required string PasswordHash { get; set; }
         public required string City { get; set; }
         public required string Address { get; set; }
         public required string PostNumber { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public required List<Offer> Offers { get; set; }
-        public required List<Request> Requests { get; set; }
+        public required List<Offer> Offers { get; set; } = new List<Offer>();
+        public required List<Request> Requests { get; set; } = new List<Request>();
     }
 }

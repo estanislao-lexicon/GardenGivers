@@ -140,3 +140,5 @@
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/obj/Debug/net8.0/API.pdb
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/obj/Debug/net8.0/API.genruntimeconfig.cache
 /home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/obj/Debug/net8.0/ref/API.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/estanislao-lexicon/Lexicon/Code/GardenGivers/API/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

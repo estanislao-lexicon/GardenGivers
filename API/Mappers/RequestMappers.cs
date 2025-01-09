@@ -9,8 +9,7 @@ namespace API.Mappers
         {
             return new RequestDto
             {
-                RequestId = requestModel.RequestId,
-                UserId = requestModel.UserId,
+                RequestId = requestModel.RequestId,                
                 OfferId = requestModel.OfferId,
                 Quantity = requestModel.Quantity,
                 DateCreated = requestModel.DateCreated,
@@ -18,22 +17,20 @@ namespace API.Mappers
             };
         }
 
-        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, int userId, int offerId)
+        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, int offerId)
         {
             return new Request
             {
-                UserId = userId,
                 OfferId = offerId,
                 Quantity = requestDto.Quantity,
                 Transactions = new List<Transaction>()                
             };
         }
 
-        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto, int userId, int offerId)
+        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto, int offerId)
         {
             return new Request
             {
-                UserId = userId,
                 OfferId = offerId,
                 Quantity = requestDto.Quantity,
                 Transactions = new List<Transaction>()

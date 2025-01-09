@@ -1,11 +1,10 @@
 ```mermaid
 erDiagram
-    Users {
-        int UserId PK
-        string FirstName // Required StringLength(50)
-        string LastName // Required StringLength(50)
+    Users {        
+        string Username
         string Email // Required
-        string PasswordHash // Required
+        string FirstName // Required StringLength(50)
+        string LastName // Required StringLength(50)                
         string Address
         string City
         string PostNumber        

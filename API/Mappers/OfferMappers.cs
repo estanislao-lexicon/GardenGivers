@@ -9,8 +9,7 @@ namespace API.Mappers
         {
             return new OfferDto
             {
-                OfferId = offerModel.OfferId,
-                UserId = offerModel.UserId,
+                OfferId = offerModel.OfferId,                
                 ProductId = offerModel.ProductId,
                 Quantity = offerModel.Quantity,
                 IsFree = offerModel.IsFree,
@@ -22,11 +21,10 @@ namespace API.Mappers
             };
         }
 
-        public static Offer ToOfferFromCreate(this CreateOfferDto offerDto, int userId, int productId)
+        public static Offer ToOfferFromCreate(this CreateOfferDto offerDto, int productId)
         {
             return new Offer
-            {
-                UserId = userId,
+            {                
                 ProductId = productId,
                 Quantity = offerDto.Quantity,
                 IsFree = offerDto.IsFree,

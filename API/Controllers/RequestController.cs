@@ -15,14 +15,12 @@ namespace API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IRequestRepository _requestRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IOfferRepository _offerRepository;
 
-        public RequestController(ApplicationDbContext context, IRequestRepository requestRepository, IUserRepository userRepository, IOfferRepository offerRepository)
+        public RequestController(ApplicationDbContext context, IRequestRepository requestRepository, IOfferRepository offerRepository)
         {
             _context = context;
-            _requestRepository = requestRepository;
-            _userRepository = userRepository;
+            _requestRepository = requestRepository;        
             _offerRepository = offerRepository;
         }
         
@@ -56,22 +54,16 @@ namespace API.Controllers
         }      
 
         [HttpPost]
-        [Route("{userId:int}/{offerId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int userId, int offerId, CreateRequestDto requestDto)
+        [Route("{offerId:int}")]
+        public async Task<IActionResult> Create([FromRoute] int offerId, CreateRequestDto requestDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!await _userRepository.UserExist(userId))
-                return BadRequest("User does not exist or is invalid");
-            
             if(!await _offerRepository.OfferExist(offerId))
                 return BadRequest("Offer does not exist or is invalid");
 
-            if (!await _requestRepository.UserCanCreateRequest(offerId, userId))
-                return BadRequest("You cannot create a request for your own offer.");
-
-            var requestModel = requestDto.ToRequestFromCreate(userId, offerId);
+            var requestModel = requestDto.ToRequestFromCreate(offerId);
             
             await _requestRepository.CreateAsync(requestModel);
 
@@ -80,12 +72,12 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("{userId:int}/{requestId:int}")]
-        public async Task<IActionResult> Update([FromRoute] int userId, int requestId, [FromBody] UpdateRequestDto updatedDto)
+        public async Task<IActionResult> Update([FromRoute] int requestId, [FromBody] UpdateRequestDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate(userId, requestId));
+            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate(requestId));
             
             if(requestModel == null)
             {

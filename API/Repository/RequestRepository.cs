@@ -63,12 +63,6 @@ namespace API.Repository
             return _context.Requests.AnyAsync(r => r.RequestId == requestId);
         }
 
-        public Task<bool> UserCanCreateRequest(int userId, int offerId)
-        {
-            var offer = _offerRepository.GetByIdAsync(offerId);
-            return Task.FromResult(offer.Result.UserId != userId);
-        }
-        
         public async Task<Request?> UpdateAsync (int requestId, Request requestModel)
         {
             var existingRequest = await _context.Requests.FindAsync(requestId);

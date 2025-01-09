@@ -5,9 +5,9 @@ GardenGivers is a community-driven platform that connects people who want to sha
 
 ## Features
 
-- User Management: Register, login, and manage user profiles.
-- Produce Listings: Create, view, and manage produce offers and requests.
-- Transactions: Facilitate and track transactions between users.
+- **User Management**: Register, login, and manage user profiles.
+- **Produce Listingsv**: Create, view, and manage produce offers and requests.
+- **Transactions**: Facilitate and track transactions between users.
 
 ## UML Diagram
 

@@ -6,7 +6,6 @@ namespace API.Dtos.Offer
     public class OfferDto
     {
         public int OfferId { get; set; }
-        public int UserId { get; set; }
         public int ProductId { get; set; }
         public decimal Quantity { get; set; }
         public bool IsFree { get; set; }

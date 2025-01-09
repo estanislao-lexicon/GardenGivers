@@ -13,15 +13,13 @@ namespace API.Controllers
     public class OfferController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IOfferRepository _offerRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IOfferRepository _offerRepository;        
         private readonly IProductRepository _productRepository;
 
-        public OfferController(ApplicationDbContext context, IOfferRepository offerRepository, IUserRepository userRepository, IProductRepository productRepository)
+        public OfferController(ApplicationDbContext context, IOfferRepository offerRepository, IProductRepository productRepository)
         {
             _context = context;
-            _offerRepository = offerRepository;
-            _userRepository = userRepository;
+            _offerRepository = offerRepository;            
             _productRepository = productRepository;
         }
         
@@ -55,19 +53,16 @@ namespace API.Controllers
         }      
 
         [HttpPost]
-        [Route("{userId:int}/{productId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int userId, int productId, CreateOfferDto offerDto)
+        [Route("{productId:int}")]
+        public async Task<IActionResult> Create([FromRoute] int productId, CreateOfferDto offerDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);  
-
-            if(!await _userRepository.UserExist(userId))
-                return BadRequest("User does not exist or is invalid");
             
             if(!await _productRepository.ProductExist(productId))
                 return BadRequest("Product does not exist or is invalid");
 
-            var offerModel = offerDto.ToOfferFromCreate(userId, productId);
+            var offerModel = offerDto.ToOfferFromCreate(productId);
             
             await _offerRepository.CreateAsync(offerModel);
 

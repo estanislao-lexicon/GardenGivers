@@ -10,7 +10,6 @@ namespace API.Interfaces
         Task<Request> CreateAsync(Request requestModel);
         Task<Request?> UpdateAsync(int requestId, Request requestModel);
         Task<Request?> DeleteAsync (int requestId);
-        Task<bool> RequestExist(int requestId);
-        Task<bool> UserCanCreateRequest(int requestId, int userId);
+        Task<bool> RequestExist(int requestId);        
     }
 }

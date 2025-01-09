@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using API.Models;
 
 namespace API.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
@@ -13,15 +15,20 @@ namespace API.Data
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Request> Requests { get; set; }
-        public DbSet<Transaction> Transactions  { get; set; }
-        public DbSet<User> Users { get; set; }
-
-      
-
+        public DbSet<Transaction> Transactions  { get; set; }        
+     
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Seed roles
+            List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Name = "User", NormalizedName = "USER" }
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
+            
             // User -> Offers with cascade delete
             modelBuilder.Entity<Offer>()
                 .HasOne(o => o.User)

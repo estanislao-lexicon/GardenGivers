@@ -4,6 +4,7 @@ using API.Interfaces;
 using API.Data;
 using API.Helpers;
 using API.Mappers;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace API.Controllers
@@ -50,7 +51,8 @@ namespace API.Controllers
             return Ok(product.ToProductDto());
         }      
 
-        [HttpPost]        
+        [HttpPost]   
+        [Authorize (Roles = "User")]     
         public async Task<IActionResult> Create([FromBody] CreateProductDto productDto)
         {
             if (!ModelState.IsValid)

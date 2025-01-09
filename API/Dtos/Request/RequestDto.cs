@@ -5,7 +5,6 @@ namespace API.Dtos.Request
     public class RequestDto
     {
         public int RequestId { get; set; }
-        public int UserId { get; set; }
         public int OfferId { get; set; }        
         public decimal Quantity { get; set; }
         public DateTime DateCreated { get; set; }
