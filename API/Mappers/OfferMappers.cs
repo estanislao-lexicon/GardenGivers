@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using API.Models;
 using API.Dtos.Offer;
 
@@ -21,6 +17,8 @@ namespace API.Mappers
                 Price = offerModel.Price,
                 DateCreated = offerModel.DateCreated,
                 ExpirationDate = offerModel.ExpirationDate,
+                Requests = offerModel.Requests.Select(r => r.ToRequestDto()).ToList(),
+                Transactions = offerModel.Transactions.Select(t => t.ToTransactionDto()).ToList()
             };
         }
 
@@ -34,6 +32,8 @@ namespace API.Mappers
                 IsFree = offerDto.IsFree,
                 Price = offerDto.Price,
                 ExpirationDate = offerDto.ExpirationDate,
+                Requests = new List<Request>(),
+                Transactions = new List<Transaction>()
             };
         }
 
@@ -45,6 +45,8 @@ namespace API.Mappers
                 IsFree = offerDto.IsFree,
                 Price = offerDto.Price,
                 ExpirationDate = offerDto.ExpirationDate,
+                Requests = new List<Request>(),
+                Transactions = new List<Transaction>()
             };
         }
     }

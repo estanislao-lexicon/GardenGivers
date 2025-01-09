@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using API.Dtos.Product;
 using API.Interfaces;
-using API.Models;
 using API.Data;
 using API.Helpers;
 using API.Mappers;
@@ -22,14 +15,13 @@ namespace API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IProductRepository _productRepository;
 
-        private ProductController(ApplicationDbContext context, IProductRepository productRepository)
+        public ProductController(ApplicationDbContext context, IProductRepository productRepository)
         {
             _context = context;
             _productRepository = productRepository;
         }
         
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] ProductQueryObject query)
         {
             if (!ModelState.IsValid)
@@ -46,7 +38,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetById([FromRoute] int productId)
         {            
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);    
+                return BadRequest(ModelState);
             
             var product = await _productRepository.GetByIdAsync(productId);
 
@@ -68,7 +60,7 @@ namespace API.Controllers
             
             await _productRepository.CreateAsync(productModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = productModel.ProductId }, productModel.ToProductDto());
+            return CreatedAtAction(nameof(GetById), new { productId = productModel.ProductId }, productModel.ToProductDto());
         }
 
         [HttpPut]

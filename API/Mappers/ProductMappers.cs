@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using API.Models;
 using API.Dtos.Product;
 
@@ -14,10 +10,9 @@ namespace API.Mappers
             return new ProductDto
             {
                 ProductId = productModel.ProductId,
-                Name = productModel.Name,
-                Description = productModel.Description,
-                Offers = productModel.Offers.Select(o => o.ToOfferDto()).ToList(),
-                Requests = productModel.Requests.Select(r => r.ToRequestDto()).ToList(),
+                ProductName = productModel.ProductName,
+                ProductDescription = productModel.ProductDescription,
+                Offers = productModel.Offers.Select(o => o.ToOfferDto()).ToList(),                
             };
         }
 
@@ -25,8 +20,9 @@ namespace API.Mappers
         {
             return new Product
             {
-                Name = productDto.Name,
-                Description = productDto.Description,                
+                ProductName = productDto.ProductName,
+                ProductDescription = productDto.ProductDescription,
+                Offers = new List<Offer>()
             };
         }
     }

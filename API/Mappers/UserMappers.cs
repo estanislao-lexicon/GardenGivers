@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using API.Models;
 using API.Dtos.User;
 
@@ -23,7 +19,7 @@ namespace API.Mappers
                 PostNumber = userModel.PostNumber,
                 DateCreated = userModel.DateCreated,
                 Offers = userModel.Offers.Select(o => o.ToOfferDto()).ToList(),
-                Requests = userModel.Requests.Select(r => r.ToRequestDto()).ToList(),
+                Requests = userModel.Requests.Select(r => r.ToRequestDto()).ToList()
             };
         }
 
@@ -37,7 +33,9 @@ namespace API.Mappers
                 PasswordHash = userDto.PasswordHash,
                 City = userDto.City,
                 Address = userDto.Address,
-                PostNumber = userDto.PostNumber,                
+                PostNumber = userDto.PostNumber,
+                Offers = new List<Offer>(),
+                Requests = new List<Request>()
             };
         }
     }

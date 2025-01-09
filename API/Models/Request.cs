@@ -1,16 +1,16 @@
-﻿using API.Dtos.Transaction;
-
-namespace API.Models
+﻿namespace API.Models
 {
     public class Request
     {
         public int RequestId { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
-        public decimal Quantity { get; set; }        
+        public int OfferId { get; set; }
+        public decimal Quantity { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-        public List<Transaction> Transactions { get; set; } 
+
+        // Navigation properties
+        public required List<Transaction> Transactions { get; set; } 
+        public User User { get; set; } = null!;
+        public Offer Offer { get; set; } = null!;
     }
 }

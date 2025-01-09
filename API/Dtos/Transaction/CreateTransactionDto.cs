@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace API.Dtos.Transaction
 {
     public class CreateTransactionDto

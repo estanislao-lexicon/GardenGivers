@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API.Dtos.Request;
+﻿using API.Dtos.Request;
 using API.Dtos.Offer;
 
 namespace API.Dtos.Product
@@ -10,9 +6,8 @@ namespace API.Dtos.Product
     public class ProductDto
     {
         public int ProductId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<OfferDto> Offers { get; set; }
-        public List<RequestDto> Requests { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string ProductDescription { get; set; } = string.Empty;
+        public List<OfferDto> Offers { get; set; } = new List<OfferDto>();        
     }
 }

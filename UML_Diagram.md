@@ -32,7 +32,7 @@ erDiagram
     Requests {
         int RequestId PK
         int UserId FK
-        int ProductId FK
+        int OfferId FK
         decimal Quantity // Required
         datetime DateCreated
     }
@@ -48,7 +48,7 @@ erDiagram
     Users ||--o{ Offers : "1-to-many"
     Users ||--o{ Requests : "1-to-many"
     Product ||--o{ Offers : "1-to-many"
-    Product ||--o{ Requests : "1-to-many"
+    Offers ||--o{ Requests : "1-to-many"
     Offers ||--o{ Transactions : "1-to-many"
     Requests ||--o{ Transactions : "1-to-many"
 

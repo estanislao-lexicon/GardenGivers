@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Dtos.Transaction;
 using API.Helpers;
 
 namespace API.Repository
@@ -18,17 +13,19 @@ namespace API.Repository
         {
             _context = context;
         }
+
         public async Task<List<Transaction>> GetAllAsync(TransactionQueryObject query)
         {
             var transactions = _context.Transactions.AsQueryable();
 
-            if(query.Quantity != null)
+            if(query.Quantity.HasValue)
             {
-                transactions = transactions.Where(t => t.Quantity == query.Quantity);
+                transactions = transactions.Where(t => t.Quantity == query.Quantity.Value);
             }
 
             return await transactions.ToListAsync();
         }
+        
         public async Task<Transaction?> GetByIdAsync(int transactionId)
         {
             return await _context.Transactions.Include(t => t.TransactionId).FirstOrDefaultAsync(i => i.TransactionId == transactionId);

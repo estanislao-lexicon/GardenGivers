@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Dtos.Offer;
 using API.Helpers;
 
 
@@ -25,29 +20,33 @@ namespace API.Repository
         {
             var offers = _context.Offers
                 .Include(t => t.Transactions)
+                .Include(r => r.Requests)
                 .AsQueryable();
             
-            if(query.Quantity  != null)
+            if(query.Quantity.HasValue)
             {
-                offers = offers.Where(o => o.Quantity == query.Quantity);
+                offers = offers.Where(o => o.Quantity == query.Quantity.Value);
             }
             if(query.IsFree != null)
             {
-                offers = offers.Where(o => o.IsFree == query.IsFree);
+                offers = offers.Where(o => o.IsFree == query.IsFree.Value);
             }
-            if(query.Price != null)
+            if(query.Price.HasValue)
             {
-                offers = offers.Where(o => o.Price == query.Price);
-            }            
+                offers = offers.Where(o => o.Price == query.Price.Value);
+            }
 
             return await offers.ToListAsync();
         }
+
         public async Task<Offer? > GetByIdAsync(int offerId)
         {
             return await _context.Offers
                 .Include(t => t.Transactions)
+                .Include(r => r.Requests)
                 .FirstOrDefaultAsync(o => o.OfferId == offerId);
         }
+        
         public async Task<Offer> CreateAsync(Offer offerModel)
         {
             await _context.Offers.AddAsync(offerModel);

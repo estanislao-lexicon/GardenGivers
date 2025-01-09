@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
 using API.Dtos.User;
-using API.Helpers;
 
 namespace API.Repository
 {
@@ -19,6 +14,7 @@ namespace API.Repository
         {
             _context = context;
         }
+
         public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users
@@ -26,6 +22,7 @@ namespace API.Repository
                 .Include(r => r.Requests)
                 .ToListAsync();
         }
+
         public async Task<User?> GetByIdAsync(int userId)
         {
             return await _context.Users                
@@ -33,6 +30,7 @@ namespace API.Repository
                 .Include(r => r.Requests)
                 .FirstOrDefaultAsync(i => i.UserId == userId);
         }
+        
         public async Task<User> CreateAsync(User userModel)
         {
             await _context.Users.AddAsync(userModel);

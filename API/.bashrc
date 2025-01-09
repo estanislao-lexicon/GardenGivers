@@ -1,0 +1,2 @@
+unset GTK_MODULES
+

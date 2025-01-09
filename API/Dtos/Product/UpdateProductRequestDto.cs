@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.Dtos.Product
 {
     public class UpdateProductRequestDto
     {
-        [Required]
-        public string Name { get; set; }
-        [Required]
-        public string Description { get; set; }         
+        public string ProductName { get; set; } = string.Empty;
+        public string ProductDescription { get; set; } = string.Empty;
     }
 }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
@@ -20,27 +16,28 @@ namespace API.Repository
         {
             _context = context;
         }
+
         public async Task<List<Product>> GetAllAsync(ProductQueryObject query)
         {
             var products = _context.Products
-                .Include(o => o.Offers)
-                .Include(r => r.Requests)
+                .Include(o => o.Offers)                
                 .AsQueryable();
 
-            if(!string.IsNullOrWhiteSpace(query.Name))
+            if(!string.IsNullOrWhiteSpace(query.ProductName))
             {
-                products = products.Where(p => p.Name.Contains(query.Name));
+                products = products.Where(p => p.ProductName.Contains(query.ProductName));
             }
 
             return await products.ToListAsync();
         }
+
         public async Task<Product?> GetByIdAsync(int productId)
         {
             return await _context.Products
-                .Include(o => o.Offers)
-                .Include(r => r.Requests)
+                .Include(o => o.Offers)                
                 .FirstOrDefaultAsync(i => i.ProductId == productId);
         }
+
         public async Task<Product> CreateAsync(Product productModel)
         {
             await _context.Products.AddAsync(productModel);
@@ -66,6 +63,7 @@ namespace API.Repository
         { 
             return _context.Products.AnyAsync(p => p.ProductId == productId);
         }
+        
         public async Task<Product?> UpdateAsync (int productId, UpdateProductRequestDto productDto)
         {
             var existingProduct = await _context.Products.FindAsync(productId);
@@ -73,8 +71,8 @@ namespace API.Repository
             if(existingProduct == null)
                return null;
 
-            existingProduct.Name = productDto.Name;
-            existingProduct.Description = productDto.Description;
+            existingProduct.ProductName = productDto.ProductName;
+            existingProduct.ProductDescription = productDto.ProductDescription;
 
             await _context.SaveChangesAsync();
             return existingProduct;

@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using API.Models;
 using API.Helpers;
-using API.Dtos.Offer;
 
 namespace API.Interfaces
 {

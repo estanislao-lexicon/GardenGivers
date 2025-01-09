@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
 using API.Models;
 using API.Data;
-using API.Dtos.Request;
 using API.Helpers;
 
 namespace API.Repository
@@ -14,24 +9,28 @@ namespace API.Repository
     public class RequestRepository : IRequestRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOfferRepository _offerRepository;
 
-        public RequestRepository(ApplicationDbContext context)
+        public RequestRepository(ApplicationDbContext context, IOfferRepository offerRepository)
         {
             _context = context;
+            _offerRepository = offerRepository;
         }
+
         public async Task<List<Request>> GetAllAsync(RequestQueryObject query)
         {
             var requests = _context.Requests
                 .Include(t => t.Transactions)
                 .AsQueryable();
             
-            if(query.Quantity != null)
+            if(query.Quantity.HasValue)
             {
-                requests = requests.Where(r => r.Quantity == query.Quantity);
+                requests = requests.Where(r => r.Quantity == query.Quantity.Value);
             }
 
             return await requests.ToListAsync();
         }
+
         public async Task<Request?> GetByIdAsync(int requestId)
         {
             return await _context.Requests
@@ -63,6 +62,13 @@ namespace API.Repository
         { 
             return _context.Requests.AnyAsync(r => r.RequestId == requestId);
         }
+
+        public Task<bool> UserCanCreateRequest(int userId, int offerId)
+        {
+            var offer = _offerRepository.GetByIdAsync(offerId);
+            return Task.FromResult(offer.Result.UserId != userId);
+        }
+        
         public async Task<Request?> UpdateAsync (int requestId, Request requestModel)
         {
             var existingRequest = await _context.Requests.FindAsync(requestId);

@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using API.Dtos.User;
 using API.Interfaces;
-using API.Models;
 using API.Data;
-using API.Helpers;
 using API.Mappers;
 
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -28,8 +21,7 @@ namespace API.Controllers
             _userRepository = userRepository;            
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet]        
         public async Task<IActionResult> GetAll()
         {
             if (!ModelState.IsValid)
@@ -57,8 +49,7 @@ namespace API.Controllers
             return Ok(user.ToUserDto());
         }      
 
-        [HttpPost]
-        
+        [HttpPost]        
         public async Task<IActionResult> Create([FromBody] CreateUserDto userDto)
         {
             if (!ModelState.IsValid)
@@ -68,7 +59,7 @@ namespace API.Controllers
 
             await _userRepository.CreateAsync(userModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = userModel.UserId }, userModel.ToUserDto());
+            return CreatedAtAction(nameof(GetById), new { userId = userModel.UserId }, userModel.ToUserDto());
         }
 
         [HttpPut]

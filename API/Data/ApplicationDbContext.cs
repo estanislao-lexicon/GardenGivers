@@ -22,9 +22,45 @@ namespace API.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // User -> Offers with cascade delete
+            modelBuilder.Entity<Offer>()
+                .HasOne(o => o.User)
+                .WithMany(u => u.Offers)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // User -> Requests with cascade delete
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Requests)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Offer -> Request with restrict delete
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.Offer)
+                .WithMany(o => o.Requests)
+                .HasForeignKey(r => r.OfferId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Transaction -> Offer with restrict delete
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Offer)
+                .WithMany(o => o.Transactions)
+                .HasForeignKey(t => t.OfferId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Transaction -> Request with restrict delete
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Request)
+                .WithMany(r => r.Transactions)
+                .HasForeignKey(t => t.RequestId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Additional precision settings as needed
             modelBuilder.Entity<Offer>()
                 .Property(o => o.Price)
-                .HasPrecision(18, 2); // Adjust precision and scale as required
+                .HasPrecision(18, 2); // Adjust precision and scale as required              
 
             modelBuilder.Entity<Offer>()
                 .Property(o => o.Quantity)
@@ -37,20 +73,6 @@ namespace API.Data
             modelBuilder.Entity<Transaction>()
                 .Property(t => t.Quantity)
                 .HasPrecision(18, 2);
-
-            // Configure the relationship between Transactions and Offers
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Offer)
-                .WithMany() // Assuming there is no navigation property on Offer
-                .HasForeignKey(t => t.OfferId)
-                .OnDelete(DeleteBehavior.NoAction); // You can change this to NoAction or Restrict if needed
-
-            // Configure the relationship between Transactions and Requests
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Request)
-                .WithMany() // Assuming there is no navigation property on Request
-                .HasForeignKey(t => t.RequestId)
-                .OnDelete(DeleteBehavior.NoAction); // To prevent cascade conflict
         }
     }
 }

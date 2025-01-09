@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using API.Dtos.Request;
 using API.Interfaces;
-using API.Models;
 using API.Data;
 using API.Helpers;
 using API.Mappers;
@@ -15,25 +9,24 @@ using API.Mappers;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/request")]
     [ApiController]
     public class RequestController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IRequestRepository _requestRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IProductRepository _productRepository;
+        private readonly IOfferRepository _offerRepository;
 
-        private RequestController(ApplicationDbContext context, IRequestRepository requestRepository, IUserRepository userRepository, IProductRepository productRepository)
+        public RequestController(ApplicationDbContext context, IRequestRepository requestRepository, IUserRepository userRepository, IOfferRepository offerRepository)
         {
             _context = context;
             _requestRepository = requestRepository;
             _userRepository = userRepository;
-            _productRepository = productRepository;
+            _offerRepository = offerRepository;
         }
         
-        [HttpGet]
-        [Authorize]
+        [HttpGet]        
         public async Task<IActionResult> GetAll([FromQuery] RequestQueryObject query)
         {
             if (!ModelState.IsValid)
@@ -63,33 +56,36 @@ namespace API.Controllers
         }      
 
         [HttpPost]
-        [Route("{userId:int, productId:int }")]      
-        public async Task<IActionResult> Create([FromRoute] int userId, int productId, CreateRequestDto requestDto)
+        [Route("{userId:int}/{offerId:int}")]
+        public async Task<IActionResult> Create([FromRoute] int userId, int offerId, CreateRequestDto requestDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if(!await _userRepository.UserExist(userId))
-                return BadRequest("User does not exist");
+                return BadRequest("User does not exist or is invalid");
             
-            if(!await _productRepository.ProductExist(productId))
-                return BadRequest("Product does not exist");
+            if(!await _offerRepository.OfferExist(offerId))
+                return BadRequest("Offer does not exist or is invalid");
 
-            var requestModel = requestDto.ToRequestFromCreate(userId, productId);
+            if (!await _requestRepository.UserCanCreateRequest(offerId, userId))
+                return BadRequest("You cannot create a request for your own offer.");
+
+            var requestModel = requestDto.ToRequestFromCreate(userId, offerId);
             
             await _requestRepository.CreateAsync(requestModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = requestModel.RequestId }, requestModel.ToRequestDto());
+            return CreatedAtAction(nameof(GetById), new { requestId = requestModel.RequestId }, requestModel.ToRequestDto());
         }
 
         [HttpPut]
-        [Route("{requestId:int}")]
-        public async Task<IActionResult> Update([FromRoute] int requestId, [FromBody] UpdateRequestDto updatedDto)
+        [Route("{userId:int}/{requestId:int}")]
+        public async Task<IActionResult> Update([FromRoute] int userId, int requestId, [FromBody] UpdateRequestDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate());
+            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate(userId, requestId));
             
             if(requestModel == null)
             {

@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using API.Models;
 using API.Helpers;
-using API.Dtos.Request;
 
 namespace API.Interfaces
 {
@@ -16,5 +11,6 @@ namespace API.Interfaces
         Task<Request?> UpdateAsync(int requestId, Request requestModel);
         Task<Request?> DeleteAsync (int requestId);
         Task<bool> RequestExist(int requestId);
+        Task<bool> UserCanCreateRequest(int requestId, int userId);
     }
 }

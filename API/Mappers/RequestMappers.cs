@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using API.Models;
 using API.Dtos.Request;
 
@@ -15,29 +11,32 @@ namespace API.Mappers
             {
                 RequestId = requestModel.RequestId,
                 UserId = requestModel.UserId,
-                ProductId = requestModel.ProductId,
+                OfferId = requestModel.OfferId,
                 Quantity = requestModel.Quantity,
                 DateCreated = requestModel.DateCreated,
-                Transactions = requestModel.Transactions.Select(t => t.ToTransactionDto()).ToList(),
+                Transactions = requestModel.Transactions.Select(t => t.ToTransactionDto()).ToList()
             };
         }
 
-        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, int userId, int productId)
+        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, int userId, int offerId)
         {
             return new Request
             {
                 UserId = userId,
-                ProductId = productId,
-                Quantity = requestDto.Quantity,                
-                
+                OfferId = offerId,
+                Quantity = requestDto.Quantity,
+                Transactions = new List<Transaction>()                
             };
         }
 
-        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto)
+        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto, int userId, int offerId)
         {
             return new Request
             {
-                Quantity = requestDto.Quantity,                
+                UserId = userId,
+                OfferId = offerId,
+                Quantity = requestDto.Quantity,
+                Transactions = new List<Transaction>()
             };
         }
     }

@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using API.Dtos.Transaction;
 using API.Interfaces;
-using API.Models;
 using API.Data;
 using API.Helpers;
 using API.Mappers;
@@ -15,7 +9,7 @@ using API.Mappers;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/transaction")]
     [ApiController]
     public class TransactionController : ControllerBase
     {
@@ -24,7 +18,7 @@ namespace API.Controllers
         private readonly IOfferRepository _offerRepository;
         private readonly IRequestRepository _requestRepository;
 
-        private TransactionController(ApplicationDbContext context, ITransactionRepository transactionRepository, IOfferRepository offerRepository, IRequestRepository requestRepository)
+        public TransactionController(ApplicationDbContext context, ITransactionRepository transactionRepository, IOfferRepository offerRepository, IRequestRepository requestRepository)
         {
             _context = context;
             _transactionRepository = transactionRepository;
@@ -33,7 +27,7 @@ namespace API.Controllers
         }
         
         [HttpGet]
-        [Authorize]
+        [Route("")]     
         public async Task<IActionResult> GetAll([FromQuery] TransactionQueryObject query)
         {
             if (!ModelState.IsValid)
@@ -63,23 +57,23 @@ namespace API.Controllers
         }      
 
         [HttpPost]
-        [Route("{offerId:int, requestId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int offerId, int requestId, CreateTransactionDto transactionDto)
+        [Route("{offerId:int}/{requestId:int}")]
+        public async Task<IActionResult> Create([FromRoute] int offerId, [FromRoute] int requestId, CreateTransactionDto transactionDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             if(!await _offerRepository.OfferExist(offerId))
-                return BadRequest("Offer does not exist");
+                return BadRequest("Offer does not exist or is invalid");
             
             if(!await _requestRepository.RequestExist(requestId))
-                return BadRequest("Request does not exist");
+                return BadRequest("Request does not exist or is invalid");
 
             var transactionModel = transactionDto.ToTransactionFromCreate(offerId, requestId);
             
             await _transactionRepository.CreateAsync(transactionModel);
 
-            return CreatedAtAction(nameof(GetById), new { id = transactionModel.TransactionId }, transactionModel.ToTransactionDto());
+            return CreatedAtAction(nameof(GetById), new { transactionId = transactionModel.TransactionId }, transactionModel.ToTransactionDto());
         }
 
         [HttpPut]

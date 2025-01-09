@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.Dtos.Product
 {
     public class CreateProductDto
     {
-        [Required]
-        public string Name { get; set; }
-        [Required]
-        public string Description { get; set; } 
+        [Required, MaxLength(50)] 
+        public string ProductName { get; set; } = string.Empty;
+        [Required, MaxLength(200)] 
+        public string ProductDescription { get; set; } = string.Empty;
     }
 }

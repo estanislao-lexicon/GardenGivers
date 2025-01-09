@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using API.Models;
 using API.Dtos.Transaction;
 
@@ -27,7 +23,7 @@ namespace API.Mappers
             {
                 OfferId = offerId,
                 RequestId = requestId,
-                Quantity = transactionDto.Quantity,                
+                Quantity = transactionDto.Quantity    
             };
         }
 
@@ -35,7 +31,7 @@ namespace API.Mappers
         {
             return new Transaction
             {
-                Quantity = transactionDto.Quantity,                
+                Quantity = transactionDto.Quantity
             };
         }
     }
