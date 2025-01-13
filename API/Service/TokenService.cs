@@ -23,7 +23,9 @@ namespace API.Service
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? throw new ArgumentNullException(nameof(user.Email))),
-                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName ?? throw new ArgumentNullException(nameof(user.UserName)))
+                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName ?? throw new ArgumentNullException(nameof(user.UserName))),
+                new Claim(JwtRegisteredClaimNames.Iss, _config["JWT:Issuer"]),
+                new Claim(JwtRegisteredClaimNames.Aud, _config["JWT:Audience"])
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
