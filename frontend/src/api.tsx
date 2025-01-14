@@ -13,7 +13,7 @@ export interface ProductSearch {
     offers: Offer[];
 }
 
-export const searchProductById = async (query: string): Promise<ProductSearch | string> => {
+export const searchProductByName = async (query: string): Promise<ProductSearch | string> => {
     try {
         const response = await axios.get<ProductSearch >(
             `http://localhost:5033/api/product/${query}`

@@ -2,6 +2,7 @@ import { JSX, SyntheticEvent } from 'react'
 import "./Card.css";
 import { ProductSearch } from '../../product';
 import AddOffer from '../Interactions/Offer/AddOffer';
+import { Link } from 'react-router-dom';
 
 interface Props {
   id: string;
@@ -21,9 +22,9 @@ const Card: React.FC<Props> = ({
       key={id} 
       id={id} 
     >        
-      <h2 className='font-bold text-center text-black md:text-left'>
+      <Link to={`/product/${searchResult.productName}`} className='font-bold text-center text-black md:text-left'>
         {searchResult.productName}
-      </h2>
+      </Link>
       <p className="text-black">Description: {searchResult.productDescription}</p>            
       <AddOffer 
         onOfferCreate={onOfferCreate}
