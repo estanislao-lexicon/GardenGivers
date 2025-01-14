@@ -10,21 +10,28 @@ interface Props {
 
 const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX.Element => {
   console.log('Props received in CardList:', {searchResult});
-  console.log('searchResult from CardList:', searchResult?.productName);
-
-  if (!searchResult) {
+  
+  if (!searchResult || !Array.isArray(searchResult) || searchResult.length === 0) {
     return <p>No results found</p>;
   }
 
   return (
-    <div>     
-      <Card 
-        id={searchResult.productId.toString()} 
-        key={searchResult?.productId} 
-        searchResult={searchResult}
-        onOfferCreate={onOfferCreate}
-      />   
-    </div>  
+    <div>
+      {searchResult.length > 0 ? (
+        searchResult.map((product) => (
+          <Card 
+            id={product.productId.toString()} 
+            key={product.productId} 
+            searchResult={product}
+            onOfferCreate={onOfferCreate}
+          />
+        ))
+      ) : (
+        <p className="mb-3 mt-3 text-xl font-semibold text-center md:text-xl">
+          No results found
+        </p>
+      )}
+    </div>
   );
 };
 

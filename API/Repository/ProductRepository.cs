@@ -35,7 +35,15 @@ namespace API.Repository
         {
             return await _context.Products
                 .Include(o => o.Offers)                
-                .FirstOrDefaultAsync(i => i.ProductId == productId);
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+        }
+
+        public async Task<List<Product>> GetByNameAsync(string productName)
+        {
+            return await _context.Products
+                .Where(p => p.ProductName.ToLower().Contains(productName.ToLower()))
+                .Include(o => o.Offers)
+                .ToListAsync();
         }
 
         public async Task<Product> CreateAsync(Product productModel)

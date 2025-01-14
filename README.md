@@ -25,8 +25,9 @@ cd GardenGivers
 ```
 
 ## Install dependencies:
-
-```csharp
+Navigate to the API project directory:
+```bash
+cd API
 dotnet restore
 ```
 
@@ -35,15 +36,47 @@ dotnet restore
 - Ensure you have the necessary database setup as per your configuration.
 - Run migrations:
 
-```csharp
+```bash
 dotnet ef database update
 ```
 
-## Run the application:
+## Seed the database:
 
-```csharp
+```bash
+dotnet run seeddata
+```
+
+
+# Run Application
+
+
+## Run the API:
+
+  1. Navigate to the API project directory:
+```bash
+cd API
+```
+
+2. Start the API:
+```bash
 dotnet run
 ```
+
+## Run the Frontend:
+
+1. Navigate to the frontend project directory:
+```bash
+cd frontend
+```
+2. Install frontend dependencies:
+```bash
+npm install
+```
+3. Start the frontend development server:
+```bash
+npm start
+```
+The API runs on http://localhost:5033 and the frontend runs on http://localhost:3000.
 
 ## Contribution
 

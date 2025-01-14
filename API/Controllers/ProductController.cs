@@ -49,7 +49,23 @@ namespace API.Controllers
             }
 
             return Ok(product.ToProductDto());
-        }      
+        }
+
+        [HttpGet("{productName}")]        
+        public async Task<IActionResult> GetByName([FromRoute] string productName)
+        {            
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var product = await _productRepository.GetByNameAsync(productName);
+
+            if (product == null || !product.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(product.Select(p => p.ToProductDto()));
+        } 
 
         [HttpPost]   
         [Authorize]     

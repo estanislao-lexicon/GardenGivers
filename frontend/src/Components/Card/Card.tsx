@@ -1,7 +1,7 @@
 import { JSX, SyntheticEvent } from 'react'
 import "./Card.css";
 import { ProductSearch } from '../../product';
-import Offer from '../Interactions/Offer';
+import AddOffer from '../Interactions/Offer/AddOffer';
 
 interface Props {
   id: string;
@@ -16,15 +16,20 @@ const Card: React.FC<Props> = ({
 }: Props) : JSX.Element => {
   
   return (
-    <div key={id} id={id} className='card'>        
-        <div className='details'>          
-            <h2>{searchResult.productName}</h2>
-            <p className='info'>Description: {searchResult.productDescription}</p>
-            <p>{id}</p>
-            <Offer 
-              onOfferCreate={onOfferCreate}
-              />
-        </div>
+    <div 
+      className="flex flex-col items-center justify-between w-full p-6 bg-slate-100 rounded-lg md:flex-row"
+      key={id} 
+      id={id} 
+    >        
+      <h2 className='font-bold text-center text-black md:text-left'>
+        {searchResult.productName}
+      </h2>
+      <p className="text-black">Description: {searchResult.productDescription}</p>            
+      <AddOffer 
+        onOfferCreate={onOfferCreate}
+        productId={searchResult.productId}
+        productName={searchResult.productName}              
+      />      
     </div>
   )
 }
