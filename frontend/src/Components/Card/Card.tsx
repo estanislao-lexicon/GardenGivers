@@ -22,7 +22,7 @@ const Card: React.FC<Props> = ({
       key={id} 
       id={id} 
     >        
-      <Link to={`/product/${searchResult.productName}`} className='font-bold text-center text-black md:text-left'>
+      <Link to={`/product/${searchResult.productName}`} className='font-bold text-center text-gray-600 md:text-left'>
         {searchResult.productName}
       </Link>
       <p className="text-black">Description: {searchResult.productDescription}</p>            

@@ -15,7 +15,7 @@ namespace API.Models
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public required List<Offer> Offers { get; set; } = new List<Offer>();
-        public required List<Request> Requests { get; set; } = new List<Request>();
+        public List<Offer> Offers { get; set; } = new List<Offer>();
+        public List<Request> Requests { get; set; } = new List<Request>();
     }
 }

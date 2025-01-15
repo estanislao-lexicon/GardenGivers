@@ -11,7 +11,7 @@ module.exports = {
     extend: {
       colors: {
         lightBlue: "hsl(215.02, 98.39%, 51.18%)",
-        darkBlue: "hsl(213.86, 58.82%, 46.67%)",
+        darkGreen: "rgb(33, 120, 68)",
         lightGreen: "hsl(156.62, 73.33%, 58.82%)",
       },
       fontFamily: {

@@ -1,10 +1,8 @@
-```mermaid
-erDiagram
     Users {        
         string Username
-        string Email // Required
-        string FirstName // Required StringLength(50)
-        string LastName // Required StringLength(50)                
+        string required Email
+        string required StringLength(50) FirstName
+        string required StringLength(50) LastName                
         string Address
         string City
         string PostNumber        
@@ -13,7 +11,7 @@ erDiagram
 
     Product {
         int ProductId PK
-        string Name // StringLength(50)
+        string StringLength(50) Name
         string Description
     }
 
@@ -21,8 +19,8 @@ erDiagram
         int OfferId PK
         int UserId FK
         int ProductId FK
-        decimal Quantity // Required
-        boolean IsFree // Required
+        decimal required Quantity
+        boolean required IsFree
         decimal Price
         datetime DateCreated
         datetime ExpirationDate
@@ -32,7 +30,7 @@ erDiagram
         int RequestId PK
         int UserId FK
         int OfferId FK
-        decimal Quantity // Required
+        decimal required Quantity
         datetime DateCreated
     }
 
@@ -40,10 +38,11 @@ erDiagram
         int TransactionId PK
         int OfferId FK
         int RequestId FK
-        decimal Quantity // Required
+        decimal required Quantity
         datetime TransactionDate
     }
-    
+```mermaid
+  erDiagram
     Users ||--o{ Offers : "1-to-many"
     Users ||--o{ Requests : "1-to-many"
     Product ||--o{ Offers : "1-to-many"

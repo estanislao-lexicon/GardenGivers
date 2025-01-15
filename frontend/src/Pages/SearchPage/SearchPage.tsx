@@ -1,10 +1,11 @@
 import React, { SyntheticEvent, useState } from 'react'
-import Navbar from '../../Components/NavBar/Navbar';
+import Navbar from '../../Components/Navbar/Navbar';
 import Hero from '../../Components/Hero/Hero';
 import Search from '../../Components/Search/Search';
 import ListOffer from '../../Components/Interactions/Offer/ListOffers';
 import CardList from '../../Components/CardList/CardList';
-import { ProductSearch, searchProductByName } from '../../api';
+import { searchProductByName } from '../../api';
+import { ProductSearch } from '../../product';
 
 
 interface Props {}

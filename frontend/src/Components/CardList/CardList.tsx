@@ -27,7 +27,7 @@ const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX
           />
         ))
       ) : (
-        <p className="mb-3 mt-3 text-xl font-semibold text-center md:text-xl">
+        <p className="mb-3 mt-3 text-xl font-semibold text-gray-600 text-center md:text-xl">
           No results found
         </p>
       )}

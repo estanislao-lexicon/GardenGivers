@@ -4,3 +4,9 @@ export interface ProductSearch {
     productDescription: string;
     offers: Offer[];
   }
+
+  export interface Offer {
+    offerId: number;
+    offerDescription: string;
+    price: number;
+}
