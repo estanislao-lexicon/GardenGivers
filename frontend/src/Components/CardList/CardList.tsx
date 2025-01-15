@@ -8,8 +8,7 @@ interface Props {
   onOfferCreate: (e: SyntheticEvent) => void;
 }
 
-const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX.Element => {
-  console.log('Props received in CardList:', {searchResult});
+const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX.Element => {  
   
   if (!searchResult || !Array.isArray(searchResult) || searchResult.length === 0) {
     return <p>No results found</p>;

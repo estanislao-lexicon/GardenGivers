@@ -31,7 +31,7 @@ const Search : React.FC<Props> = ({
           ></input>
           <button onClick={handleButtonClick} >
             Search 
-          </button>
+          </button>          
         </form>            
       </div>  
     </section>

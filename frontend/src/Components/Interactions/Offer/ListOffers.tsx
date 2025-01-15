@@ -16,7 +16,7 @@ const ListOffer = ({ offersCreated, onOfferDelete }: Props) => {
         {offersCreated && offersCreated.length > 0 ? (
           offersCreated.map((offerCreated) => (
             <CardOffer 
-              // key={offerCreated.id} 
+              //key={offerCreated.oferId} 
               offerCreated={offerCreated} 
               onOfferDelete={onOfferDelete}
             />

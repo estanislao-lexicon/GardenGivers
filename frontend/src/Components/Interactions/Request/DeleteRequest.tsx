@@ -1,15 +1,15 @@
 import React, { SyntheticEvent } from 'react'
 
 interface Props {
-    onOfferDelete: (e: SyntheticEvent) => void;
-    offerCreated: string;
+    onRequestDelete: (e: SyntheticEvent) => void;
+    requestCreated: string;
 }
 
-const DeleteOffer = ({onOfferDelete, offerCreated}: Props) => {
+const DeleteRequest = ({onRequestDelete, requestCreated}: Props) => {
   return (
     <div>
-        <form onSubmit={onOfferDelete}>
-          <input hidden={true} value={offerCreated} />
+        <form onSubmit={onRequestDelete}>
+          <input hidden={true} value={requestCreated} />
           <button className="block w-full py-3 text-white duration-200 border-2 rounded-lg bg-red-500 hover:text-red-500 hover:bg-white border-red-500">
             X
           </button>
@@ -18,4 +18,4 @@ const DeleteOffer = ({onOfferDelete, offerCreated}: Props) => {
   )
 }
 
-export default DeleteOffer;
+export default DeleteRequest;

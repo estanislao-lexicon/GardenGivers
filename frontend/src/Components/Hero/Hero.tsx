@@ -1,4 +1,3 @@
-import React from "react";
 import "./Hero.css";
 import { Link } from "react-router-dom";
 import logo from "./logo512.png";
@@ -11,10 +10,10 @@ const Hero = (props: Props) => {
       <div className="container flex flex-col-reverse mx-auto p-8 lg:flex-row lg:items-center">
         <div className="flex flex-col space-y-10 mb-44 m-10 lg:m-10 xl:m-20 lg:mt-16 lg:w-1/2 xl:mb-52">
           <h1 className="text-5xl font-bold text-center text-gray-600 lg:text-6xl lg:max-w-md lg:text-left">
-            Connect & Share to reduce food waste and promote a sharing economy within local communities.
+            Connect, share, and reduce food waste!
           </h1>
           <p className="text-2xl text-center text-gray-400 lg:max-w-md lg:text-left">
-            Join the community to share or sell homegrown fruit & vegetables, hunting meats, wild fruits, and mushrooms picked from the forest.
+            Join the sharing economy within local communities. Share or sell homegrown fruit & vegetables, hunting meats, wild fruits, and mushrooms picked from the forest.
           </p>
           <div className="mx-auto lg:mx-0">
             <Link
@@ -27,8 +26,8 @@ const Hero = (props: Props) => {
         </div>
 
         {/* Logo aligned to the right and on the same line as the h1 */}
-        <div className="lg:ml-10 flex items-start">
-          <img src={logo} alt="Logo" className="h-32 lg:h-50% xl:h-max" />
+        <div className="lg:ml-0 flex items-end">
+          <img src={logo} alt="Logo" className="h-30 md:h-38 lg:h-46 xl:h-50" />
         </div>
       </div>
     </section>

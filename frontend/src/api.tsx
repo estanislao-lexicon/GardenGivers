@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { UserSearch } from './user';
 import { ProductSearch } from './product';
 
 
@@ -22,14 +21,21 @@ export const searchProductByName = async (query: string): Promise<ProductSearch 
     }
 };
 
-export const searchUserByUserName = async (query: string) => {
-    try {
-        const response = await axios.get<UserSearch>(
-            "http://localhost:5033/api/account/user",
-        );
-        console.log("response: ", response.data);  
+export const searchUserProfile = async () => {
+    
+    const token = localStorage.getItem("token");
+            
+    try {        
+        const response = await fetch('http://localhost:5033/api/account/user', {
+            method: 'GET',
+            headers: {
+              'accept': '*/*',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+        console.log("response: ", response);  
         // Return the `data` field (the actual UserSearch object)
-        return response.data;  
+        return response.json();  
     } catch (error : any) {
         if (axios.isAxiosError(error)) {
             console.log("error message: ", error.message);

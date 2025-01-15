@@ -1,5 +1,4 @@
 import { JSX, SyntheticEvent } from 'react'
-import "./Card.css";
 import { ProductSearch } from '../../product';
 import AddOffer from '../Interactions/Offer/AddOffer';
 import { Link } from 'react-router-dom';
@@ -17,20 +16,23 @@ const Card: React.FC<Props> = ({
 }: Props) : JSX.Element => {
   
   return (
-    <div 
-      className="flex flex-col items-center justify-between w-full p-6 bg-slate-100 rounded-lg md:flex-row"
-      key={id} 
-      id={id} 
-    >        
-      <Link to={`/product/${searchResult.productName}`} className='font-bold text-center text-gray-600 md:text-left'>
-        {searchResult.productName}
-      </Link>
-      <p className="text-black">Description: {searchResult.productDescription}</p>            
-      <AddOffer 
-        onOfferCreate={onOfferCreate}
-        productId={searchResult.productId}
-        productName={searchResult.productName}              
-      />      
+    <div className="text-sm leading-6 mb-5">
+      <figure className="flex flex-col-reverse items-center justify-center bg-slate-100 rounded-xl p-6 max-w-md mx-auto">
+        <blockquote className="mt-6 text-slate-700 text-center">
+          <p>{searchResult.productDescription}</p>
+        </blockquote>
+        <figcaption className="flex items-center space-x-4">
+              
+          <Link to={`/product/${searchResult.productName}`} className="text-base text-slate-900 font-semibold">
+            {searchResult.productName}
+          </Link>            
+          <AddOffer
+            onOfferCreate={onOfferCreate}
+            productId={searchResult.productId}
+            productName={searchResult.productName}
+          />               
+        </figcaption>
+      </figure>
     </div>
   )
 }

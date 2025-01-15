@@ -6,12 +6,12 @@ import { ToastContainer } from 'react-toastify';
 import { UserProvider } from './Context/useAuth';
 
 
-function App() {
-  
+
+function App() {  
   return (
     <>
       <UserProvider>
-        <Navbar />
+        <Navbar />        
         <Outlet />
         <ToastContainer />
       </UserProvider>

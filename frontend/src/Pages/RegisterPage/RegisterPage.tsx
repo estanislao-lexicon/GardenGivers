@@ -3,12 +3,13 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from '../../Context/useAuth';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 
 type Props = {}
 
 type RegisterFormInputs = {
-  userName: string;
+    username: string;
     email: string;
     password: string;
     firstName: string;
@@ -19,7 +20,7 @@ type RegisterFormInputs = {
 };
 
 const validation = Yup.object().shape({
-    userName: Yup.string().required("Username is required"),
+    username: Yup.string().required("Username is required"),
     email: Yup.string().required("Email is required"),
     password: Yup.string().required("Password is required"),
 
@@ -40,7 +41,7 @@ function RegisterPage({}: Props) {
     
     const handleLogin = (form: RegisterFormInputs) => {
         registerUser(
-            form.userName, 
+            form.username, 
             form.email, 
             form.password,
             form.firstName, 
@@ -90,9 +91,9 @@ function RegisterPage({}: Props) {
                     id="username"
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-700"
                     placeholder="Username"
-                    {...register("userName")}
+                    {...register("username")}
                   />
-                  {errors.userName && <p className="text-red-500 text-sm">{errors.userName.message}</p>}
+                  {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                 </div>
     
                 {/* Password */}
@@ -211,7 +212,14 @@ function RegisterPage({}: Props) {
                   >
                     Register
                   </button>
-                </div>
+                  <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                      Already have an account?{" "}
+                      <Link to="/login" className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                      >
+                      Login
+                      </Link>
+                  </p>       
+                </div>                       
               </form>
             </div>
           </div>

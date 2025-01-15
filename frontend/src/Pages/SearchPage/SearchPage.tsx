@@ -1,6 +1,4 @@
 import React, { SyntheticEvent, useState } from 'react'
-import Navbar from '../../Components/Navbar/Navbar';
-import Hero from '../../Components/Hero/Hero';
 import Search from '../../Components/Search/Search';
 import ListOffer from '../../Components/Interactions/Offer/ListOffers';
 import CardList from '../../Components/CardList/CardList';
@@ -11,7 +9,7 @@ import { ProductSearch } from '../../product';
 interface Props {}
 
 const SearchPage = (props: Props) => {
-    const [search, setSearch] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
   const [offersCreated, setOffersCreated] = useState<string[]>([]);
   const [searchResult, setSearchResult] = useState<ProductSearch | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
