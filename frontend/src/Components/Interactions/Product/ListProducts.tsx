@@ -8,14 +8,18 @@ interface Props {
   onOfferCreate: (e: SyntheticEvent) => void;
 }
 
-const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX.Element => {  
+const ListProduct: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX.Element => {  
   
   if (!searchResult || !Array.isArray(searchResult) || searchResult.length === 0) {
-    return <p>No results found</p>;
+    return (
+      <p className="mb-3 mt-3 text-xl font-semibold text-gray-600 text-center md:text-xl">
+      No results found
+      </p>
+    );
   }
 
   return (
-    <div>
+    <div className="flex items-center justify-center h-full">
       {searchResult.length > 0 ? (
         searchResult.map((product) => (
           <Card 
@@ -34,4 +38,4 @@ const CardList: React.FC<Props> = ({ searchResult, onOfferCreate }: Props) : JSX
   );
 };
 
-export default CardList;
+export default ListProduct;

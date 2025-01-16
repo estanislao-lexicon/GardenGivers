@@ -1,34 +1,35 @@
 import React, { SyntheticEvent } from 'react'
 import CardOffer from './CardOffer';
+import { Offer } from '../../../product'
 
 interface Props {
-    offersCreated: string[];
-    onOfferDelete: (e: SyntheticEvent) => void;
+    offersResult: Offer[] | null;
+    onOfferCreate: (e: SyntheticEvent) => void;
 }
 
-const ListsOffers = ({ offersCreated, onOfferDelete }: Props) => {
+const ListOffer: React.FC<Props> = ({ offersResult, onOfferCreate }) => {
+  if (!offersResult || !Array.isArray(offersResult) || offersResult.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl font-semibold text-gray-600 text-center">
+          No offer found
+        </p>
+      </div>
+    );
+  }
+  
   return (
-    <section id="offers-created">
-      <h2 className="mb-3 mt-3 text-3xl text-gray-700 font-semibold text-center md:text-4xl">
-        Offers Created
-      </h2>
-      <div className="relative flex flex-col items-center max-w-5xl mx-auto space-y-10 px-10 mb-5 md:px-6 md:space-y-0 md:space-x-7 md:flex-row">
-        {offersCreated && offersCreated.length > 0 ? (
-          offersCreated.map((offerCreated) => (
-            <CardOffer 
-              //key={offerCreated.oferId} 
-              offerCreated={offerCreated} 
-              onOfferDelete={onOfferDelete}
-            />
-          ))
-        ) : (
-          <h2 className="mb-3 mt-3 text-xl text-gray-500 font-semibold text-center md:text-xl">
-            No Offers created.
-          </h2>
-        )}
-      </div>      
-    </section>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {offersResult.map((offer) => (
+        <CardOffer
+          id={offer.offerId} // Assuming `offerId` exists in the `Offer` type
+          key={offer.offerId} // Fixed: Correct key usage
+          offerResult={offer}
+          onOfferCreate={onOfferCreate}
+        />
+      ))}
+    </div>
   );
 };
 
-export default ListsOffers;
+export default ListOffer;

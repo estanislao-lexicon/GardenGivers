@@ -1,32 +1,80 @@
-import React, { useState } from 'react'
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import ListRequests from '../../Components/Interactions/Request/ListRequests';
+import { getAllRequests } from '../../api';
+import { Request } from '../../product';
 
 
 interface Props {}
 
-const RequestsPage = (props: Props) => {
+const RequestsPage: React.FC<Props> = () => {
   const [requestsCreated, setRequestsCreated] = useState<string[]>([]);
+  const [requestsResult, setRequestsResult] = useState<Request[]>([]);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const onRequestCreate = (e: any) => {
+  // Fetch all requests when the component mounts
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await getAllRequests();
+        let result;
+        if (typeof response === 'string') {
+          result = response;
+        } else {
+          result = await response.json();
+        }
+
+        if (typeof result === 'string') {
+          setServerError(result);
+        } else if (Array.isArray(result)) {
+          setRequestsResult(result); // Correctly set the array of requests
+        }
+      } catch (error) {
+        setServerError('Failed to fetch requests');
+      }
+    };
+
+    fetchRequests();
+  }, []); // Empty dependency array ensures this runs once on mount
+
+  // Create a request
+  const onRequestCreate = (e: SyntheticEvent) => {
     e.preventDefault();
-    const exists = requestsCreated.find((request) => request === e.target[0].value);
-    if(exists) {
+    const target = e.target as HTMLFormElement;
+    const newRequest = (target[0] as HTMLInputElement)?.value;
+
+    if (!newRequest) return;
+
+    if (requestsCreated.includes(newRequest)) {
+      alert('Request already exists');
       return;
     }
-    const updatedRequestList = [...requestsCreated, e.target[0].value];
-    setRequestsCreated(updatedRequestList);    
+
+    setRequestsCreated((prev) => [...prev, newRequest]);
   };
 
-  const onRequestDelete = (e: any) => {
+  // Delete a request
+  const onRequestDelete = (e: SyntheticEvent) => {
     e.preventDefault();
-    const removedRequest = requestsCreated.filter((request) => {
-      return request !== e.target[0].value;
-    });
+    const target = e.target as HTMLFormElement;
+    const requestToRemove = (target[0] as HTMLInputElement)?.value;
+
+    if (!requestToRemove) return;
+
+    setRequestsCreated((prev) =>
+      prev.filter((request) => request !== requestToRemove)
+    );
   };
 
   return (
     <div>
-      <ListRequests requestsCreated={requestsCreated} onRequestDelete={onRequestDelete} />
+      {serverError && (
+        <p className="text-red-500 text-center mb-4">{serverError}</p>
+      )}
+
+      <ListRequests
+        requestsResult={requestsResult}
+        onRequestCreate={onRequestCreate}
+      />
     </div>
   )
 };

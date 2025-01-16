@@ -16,7 +16,7 @@ const Card: React.FC<Props> = ({
 }: Props) : JSX.Element => {
   
   return (
-    <div className="text-sm leading-6 mb-5">
+    <div className="text-sm leading-6 mr-5">
       <figure className="flex flex-col-reverse items-center justify-center bg-slate-100 rounded-xl p-6 max-w-md mx-auto">
         <blockquote className="mt-6 text-slate-700 text-center">
           <p>{searchResult.productDescription}</p>

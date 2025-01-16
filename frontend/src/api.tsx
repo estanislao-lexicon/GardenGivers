@@ -32,7 +32,7 @@ export const searchUserProfile = async () => {
               'accept': '*/*',
               'Authorization': `Bearer ${token}`,
             },
-          });
+        });
         console.log("response: ", response);  
         // Return the `data` field (the actual UserSearch object)
         return response.json();  
@@ -47,6 +47,48 @@ export const searchUserProfile = async () => {
     }
 };
 
-export const allOffers = async () => {
+export const getAllOffers = async () => {
+    const token = localStorage.getItem("token");
     
-}
+    try {
+        const response = await fetch('http://localhost:5033/api/offer', {
+            method: 'GET',
+            headers: {
+              'accept': '*/*',
+              'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log("error message: ", error.message);
+            return error.message;
+        } else {
+            console.log("unexpected error: ", error);
+            return "An unexpected error occurred";
+        }
+    }
+};
+
+export const getAllRequests = async () => {
+    const token = localStorage.getItem("token");
+    
+    try {
+        const response = await fetch('http://localhost:5033/api/request', {
+            method: 'GET',
+            headers: {
+              'accept': '*/*',
+              'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log("error message: ", error.message);
+            return error.message;
+        } else {
+            console.log("unexpected error: ", error);
+            return "An unexpected error occurred";
+        }
+    }
+};

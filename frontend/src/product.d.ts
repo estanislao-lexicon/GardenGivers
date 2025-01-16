@@ -1,4 +1,4 @@
-export interface ProductSearch {
+  export interface ProductSearch {
     productId: number;
     productName: string;
     productDescription: string;
@@ -8,5 +8,15 @@ export interface ProductSearch {
   export interface Offer {
     offerId: number;
     offerDescription: string;
+    quantity: number;
+    isFree: boolean;
     price: number;
-}
+    expirationDate: string;
+  }
+
+  export interface Request {
+    requestId: number;
+    offerId: number;
+    quantity: number;
+    dateCreated: string;
+  }

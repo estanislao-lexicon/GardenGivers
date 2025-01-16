@@ -29,7 +29,7 @@ const Search : React.FC<Props> = ({
             value={search} 
             onChange={(e) => handleSearchChange(e)}
           ></input>
-          <button onClick={handleButtonClick} >
+          <button className="text-gray-600" onClick={handleButtonClick} >
             Search 
           </button>          
         </form>            

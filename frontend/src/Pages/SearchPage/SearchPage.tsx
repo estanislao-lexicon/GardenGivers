@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useState } from 'react'
 import Search from '../../Components/Search/Search';
-import CardList from '../../Components/Interactions/Product/ListProducts';
+import ListProduct from '../../Components/Interactions/Product/ListProducts';
 import { searchProductByName } from '../../api';
 import { ProductSearch } from '../../product';
 
@@ -47,7 +47,7 @@ const SearchPage = (props: Props) => {
   return (
     <div className="App">
       <Search onSearchSubmit={onSearchSubmit} search={search} handleSearchChange={handleSearchChange}/>      
-      <CardList searchResult={searchResult} onOfferCreate={onOfferCreate}/>
+      <ListProduct searchResult={searchResult} onOfferCreate={onOfferCreate}/>
       {serverError && <p>{serverError}</p>}
     </div>
   )

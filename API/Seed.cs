@@ -103,17 +103,17 @@ namespace API
                     },
                     new Product()
                     {
-                        ProductName = "Deer Meet",
+                        ProductName = "Deer Meat",
                         ProductDescription = "Lean and tender deer meat."
                     },
                     new Product()
                     {
-                        ProductName = "Moose Meet",
+                        ProductName = "Moose Meat",
                         ProductDescription = "Lean and tender moose meat."
                     },
                     new Product()
                     {
-                        ProductName = "Wild boar Meet",
+                        ProductName = "Wild boar Meat",
                         ProductDescription = "Lean and tender wild boar meat."
                     }                  
                 };
