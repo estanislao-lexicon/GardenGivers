@@ -20,7 +20,9 @@ namespace API.Repository
         public async Task<List<Product>> GetAllAsync(ProductQueryObject query)
         {
             var products = _context.Products
-                .Include(o => o.Offers)                
+                .Include(p => p.Offers)
+                .ThenInclude(o => o.Requests)
+                .ThenInclude(o => o.Transactions)
                 .AsQueryable();
 
             if(!string.IsNullOrWhiteSpace(query.ProductName))
@@ -34,7 +36,9 @@ namespace API.Repository
         public async Task<Product?> GetByIdAsync(int productId)
         {
             return await _context.Products
-                .Include(o => o.Offers)                
+                .Include(p => p.Offers)
+                .ThenInclude(o => o.Requests)
+                .ThenInclude(o => o.Transactions)
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
 
@@ -42,7 +46,7 @@ namespace API.Repository
         {
             return await _context.Products
                 .Where(p => p.ProductName.ToLower().Contains(productName.ToLower()))
-                .Include(o => o.Offers)
+                .Include(p => p.Offers)
                 .ToListAsync();
         }
 
@@ -72,7 +76,7 @@ namespace API.Repository
             return _context.Products.AnyAsync(p => p.ProductId == productId);
         }
         
-        public async Task<Product?> UpdateAsync (int productId, UpdateProductRequestDto productDto)
+        public async Task<Product?> UpdateAsync (int productId, UpdateProductDto productDto)
         {
             var existingProduct = await _context.Products.FindAsync(productId);
 

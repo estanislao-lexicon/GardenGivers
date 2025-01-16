@@ -18,8 +18,8 @@ namespace API.Models
         public User User { get; set; } = null!;
         public Product Product { get; set; } = null!;
         [Required]
-        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-        [Required]
         public List<Request> Requests { get; set; } = new List<Request>();
+        [Required]
+        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

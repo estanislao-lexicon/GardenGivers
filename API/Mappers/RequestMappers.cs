@@ -1,5 +1,6 @@
 using API.Models;
 using API.Dtos.Request;
+using API.Dtos.Transaction;
 
 namespace API.Mappers
 {
@@ -9,31 +10,36 @@ namespace API.Mappers
         {
             return new RequestDto
             {
-                RequestId = requestModel.RequestId,                
+                RequestId = requestModel.RequestId,    
+                UserId = requestModel.UserId,            
                 OfferId = requestModel.OfferId,
                 Quantity = requestModel.Quantity,
                 DateCreated = requestModel.DateCreated,
-                Transactions = requestModel.Transactions.Select(t => t.ToTransactionDto()).ToList()
+                Transactions = requestModel.Transactions != null
+                                ? requestModel.Transactions.Select(t => t.ToTransactionDto()).ToList()
+                                : new List<TransactionDto>()
             };
         }
 
-        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, int offerId)
+        public static Request ToRequestFromCreate(this CreateRequestDto requestDto, string userId, int offerId)
         {
             return new Request
             {
+                UserId = userId,
                 OfferId = offerId,
                 Quantity = requestDto.Quantity,
                 Transactions = new List<Transaction>()                
             };
         }
 
-        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto, int offerId)
+        public static Request ToRequestFromUpdate(this UpdateRequestDto requestDto, string userId, int offerId, Request existingRequest)
         {
             return new Request
             {
+                UserId = userId,
                 OfferId = offerId,
                 Quantity = requestDto.Quantity,
-                Transactions = new List<Transaction>()
+                Transactions = existingRequest.Transactions ?? new List<Transaction>()
             };
         }
     }

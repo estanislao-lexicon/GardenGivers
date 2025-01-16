@@ -4,7 +4,7 @@ namespace API.Dtos.Offer
 {
     public class CreateOfferDto
     {
-        [Required, MaxLength(50)]        
+        [Required]
         public decimal Quantity { get; set; }
         [Required]
         public bool IsFree { get; set; }

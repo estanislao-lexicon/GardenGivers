@@ -1,6 +1,6 @@
 import { JSX, SyntheticEvent } from 'react'
-import Card from '../Card/Card'
-import { ProductSearch } from '../../product'
+import Card from './Card'
+import { ProductSearch } from '../../../product'
 
 
 interface Props {

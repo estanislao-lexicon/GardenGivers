@@ -1,7 +1,6 @@
 import React, { SyntheticEvent, useState } from 'react'
 import Search from '../../Components/Search/Search';
-import ListOffer from '../../Components/Interactions/Offer/ListOffers';
-import CardList from '../../Components/CardList/CardList';
+import CardList from '../../Components/Interactions/Product/ListProducts';
 import { searchProductByName } from '../../api';
 import { ProductSearch } from '../../product';
 
@@ -27,22 +26,17 @@ const SearchPage = (props: Props) => {
     const updatedOfferList = [...offersCreated, e.target[0].value];
     setOffersCreated(updatedOfferList);
   };
-
-  const onOfferDelete = (e: any) => {
-    e.preventDefault();
-    const removedOffer = offersCreated.filter((offer) => {
-      return offer !== e.target[0].value;
-    });
-    setOffersCreated(removedOffer);
-  };
-
+  
   const onSearchSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
+    if (!search.trim()) {
+      setSearchResult(null);
+      return;
+    }
     setServerError(null);
 
     const result = await searchProductByName(search);
-    console.log('Result in APP:', result);
-        
+            
     if (typeof result === 'string') {
       setServerError(result);
     } else if (result) {
@@ -52,8 +46,7 @@ const SearchPage = (props: Props) => {
   
   return (
     <div className="App">
-      <Search onSearchSubmit={onSearchSubmit} search={search} handleSearchChange={handleSearchChange}/>
-      <ListOffer offersCreated={offersCreated} onOfferDelete={onOfferDelete} />
+      <Search onSearchSubmit={onSearchSubmit} search={search} handleSearchChange={handleSearchChange}/>      
       <CardList searchResult={searchResult} onOfferCreate={onOfferCreate}/>
       {serverError && <p>{serverError}</p>}
     </div>

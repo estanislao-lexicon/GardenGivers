@@ -1,6 +1,6 @@
 import { JSX, SyntheticEvent } from 'react'
-import { ProductSearch } from '../../product';
-import AddOffer from '../Interactions/Offer/AddOffer';
+import { ProductSearch } from '../../../product';
+import AddOffer from '../Offer/AddOffer';
 import { Link } from 'react-router-dom';
 
 interface Props {

@@ -30,7 +30,7 @@ namespace API.Controllers
                 return BadRequest(ModelState);
 
             var offers = await _offerRepository.GetAllAsync(query);
-            
+                                                
             var offerDto = offers.Select(o => o.ToOfferDto());
 
             return Ok(offerDto);
@@ -58,11 +58,26 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);  
+
+            var userId = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is missing.");
             
             if(!await _productRepository.ProductExist(productId))
-                return BadRequest("Product does not exist or is invalid");
+                return NotFound($"Product with ID {productId} not found.");
+            
+            // Check if the user already has an offer for this product
+            var existingOffer = await _offerRepository.GetOfferByUserAndProductAsync(userId, productId);
+            if (existingOffer != null)
+                return Conflict("You already have an offer for this product.");
+            
+            if (offerDto.IsFree && offerDto.Price > 0)
+                return BadRequest("Free offers cannot have a price.");
 
-            var offerModel = offerDto.ToOfferFromCreate(productId);
+            if (offerDto.ExpirationDate <= DateTime.UtcNow)
+                return BadRequest("Expiration date must be in the future.");
+
+            var offerModel = offerDto.ToOfferFromCreate(userId, productId);
             
             await _offerRepository.CreateAsync(offerModel);
 
@@ -76,7 +91,10 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var offerModel = await _offerRepository.UpdateAsync(offerId, updatedDto.ToOfferFromUpdate());
+            // Fetch the existing offer from the database using the offerId
+            var existingOffer = await _offerRepository.GetByIdAsync(offerId); 
+
+            var offerModel = await _offerRepository.UpdateAsync(offerId, updatedDto.ToOfferFromUpdate(existingOffer));
             
             if(offerModel == null)
             {
@@ -92,6 +110,14 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            
+            var userId = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is missing.");
+            
+            var existingOffer = await _offerRepository.GetByIdAsync(offerId);
+            if (existingOffer.UserId != userId)
+                return Forbid("You cannot delete an offer from another user.");
 
             var offerModel = await _offerRepository.DeleteAsync(offerId);
 

@@ -46,3 +46,7 @@ export const searchUserProfile = async () => {
         }
     }
 };
+
+export const allOffers = async () => {
+    
+}

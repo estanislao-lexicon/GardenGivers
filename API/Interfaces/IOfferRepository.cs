@@ -11,5 +11,7 @@ namespace API.Interfaces
         Task<Offer?> UpdateAsync(int offerId, Offer offerModel);
         Task<Offer?> DeleteAsync (int offerId);
         Task<bool> OfferExist(int offerId);
+        Task<Offer?> GetOfferByUserAndProductAsync(string userId, int productId);
+        Task<Offer?> GetOfferByUserAndOfferAsync(string userId, int offerId);
     }
 }

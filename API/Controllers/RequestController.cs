@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using API.Dtos.Request;
 using API.Interfaces;
 using API.Data;
 using API.Helpers;
 using API.Mappers;
+using Microsoft.Identity.Client;
 
 
 namespace API.Controllers
@@ -60,10 +60,24 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var userId = User.FindFirst("UserId")?.Value;            
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is missing.");
+
             if(!await _offerRepository.OfferExist(offerId))
                 return BadRequest("Offer does not exist or is invalid");
 
-            var requestModel = requestDto.ToRequestFromCreate(offerId);
+            // Avoid user creating a request on his/her offer
+            var offer = await _offerRepository.GetByIdAsync(offerId);
+            if (offer.UserId == userId)
+                return Forbid("You cannot create a request for your own offer.");
+            
+            // Check if the user already has a request for this product
+            var existingRequest = await _offerRepository.GetOfferByUserAndOfferAsync(userId, offerId);
+            if (existingRequest != null)
+                return Conflict("You already have a request for this product.");
+
+            var requestModel = requestDto.ToRequestFromCreate(userId, offerId);
             
             await _requestRepository.CreateAsync(requestModel);
 
@@ -71,13 +85,19 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Route("{userId:int}/{requestId:int}")]
+        [Route("{requestId:int}")]
         public async Task<IActionResult> Update([FromRoute] int requestId, [FromBody] UpdateRequestDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate(requestId));
+            var userId = User.FindFirst("UserId")?.Value;            
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is missing.");
+
+            var existingRequest = await _requestRepository.GetByIdAsync(requestId);
+
+            var requestModel = await _requestRepository.UpdateAsync(requestId, updatedDto.ToRequestFromUpdate(userId, requestId, existingRequest));
             
             if(requestModel == null)
             {
@@ -93,7 +113,15 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            
+            var userId = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User ID is missing.");
 
+            var existingRequest = await _requestRepository.GetByIdAsync(requestId);
+            if (existingRequest.UserId != userId)
+                return Forbid("You cannot delete a request from another user.");
+            
             var requestModel = await _requestRepository.DeleteAsync(requestId);
 
             if (requestModel == null)

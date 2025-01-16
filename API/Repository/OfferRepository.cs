@@ -19,8 +19,8 @@ namespace API.Repository
         public async Task<List<Offer>> GetAllAsync(OfferQueryObject query)
         {
             var offers = _context.Offers
-                .Include(t => t.Transactions)
-                .Include(r => r.Requests)
+                .Include(o => o.Requests)
+                .ThenInclude(o => o.Transactions)
                 .AsQueryable();
             
             if(query.Quantity.HasValue)
@@ -42,8 +42,8 @@ namespace API.Repository
         public async Task<Offer? > GetByIdAsync(int offerId)
         {
             return await _context.Offers
-                .Include(t => t.Transactions)
-                .Include(r => r.Requests)
+                .Include(o => o.Requests)
+                .ThenInclude(o => o.Transactions)
                 .FirstOrDefaultAsync(o => o.OfferId == offerId);
         }
         
@@ -85,6 +85,18 @@ namespace API.Repository
 
             await _context.SaveChangesAsync();
             return existingOffer;
+        }
+
+        public async Task<Offer?> GetOfferByUserAndProductAsync(string userId, int productId)
+        {
+            return await _context.Offers
+                .FirstOrDefaultAsync(o => o.UserId == userId && o.ProductId == productId);
+        }
+
+        public async Task<Offer?> GetOfferByUserAndOfferAsync(string userId, int offerId)
+        {
+            return await _context.Offers
+                .FirstOrDefaultAsync(o => o.UserId == userId && o.OfferId == offerId);
         }
     }
 }

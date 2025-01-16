@@ -24,6 +24,7 @@ namespace API.Service
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? throw new ArgumentNullException(nameof(user.Email))),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName ?? throw new ArgumentNullException(nameof(user.UserName))),
+                new Claim("UserId", user.Id ?? throw new ArgumentNullException(nameof(user.Id))),
                 new Claim(JwtRegisteredClaimNames.Iss, _config["JWT:Issuer"]),
                 new Claim(JwtRegisteredClaimNames.Aud, _config["JWT:Audience"])
             };

@@ -1,10 +1,10 @@
-﻿namespace API.Dtos.Account
+namespace API.Dtos.Account
 {
-    public class RegisterDto
-    {        
+    public class UserLoggedDto
+    {
+        public required string UserId { get; set; }        
         public required string? Username { get; set; }
-        public required string? Email { get; set; }
-        public required string? Password { get; set; }
+        public required string? Email { get; set; }        
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string City { get; set; }

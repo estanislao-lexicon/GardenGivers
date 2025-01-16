@@ -31,7 +31,7 @@ namespace API.Controllers
       if (!ModelState.IsValid)
         return BadRequest(ModelState);
 
-      var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+      var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());      
 
       if (user == null)
         return Unauthorized("Invalid username");
@@ -43,16 +43,16 @@ namespace API.Controllers
 
       return Ok(
           new NewUserDto
-          {
-            Username = user.UserName,
-            Email = user.Email,
-            Token = _tokenService.CreateToken(user),
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            City = user.City,
-            Address = user.Address,
-            PostNumber = user.PostNumber
-          }
+            { 
+              Username = user.UserName,
+              Email = user.Email,
+              Token = _tokenService.CreateToken(user),
+              FirstName = user.FirstName,
+              LastName = user.LastName,
+              City = user.City,
+              Address = user.Address,
+              PostNumber = user.PostNumber
+            }
       );
     }
 
@@ -83,10 +83,10 @@ namespace API.Controllers
         {
           var roleResult = await _userManager.AddToRoleAsync(user, "User");
           if (roleResult.Succeeded)
-          {
+          {            
             return Ok(
                 new NewUserDto
-                {
+                { 
                   Username = user.UserName,
                   Email = user.Email,
                   Token = _tokenService.CreateToken(user),
@@ -127,11 +127,11 @@ namespace API.Controllers
       }
 
       return Ok(
-          new NewUserDto
+          new UserLoggedDto
           {
+            UserId = user.Id,
             Username = user.UserName,
-            Email = user.Email,
-            Token = _tokenService.CreateToken(user),
+            Email = user.Email,            
             FirstName = user.FirstName,
             LastName = user.LastName,
             City = user.City,
@@ -141,5 +141,5 @@ namespace API.Controllers
       );
     }
 
-  }
+  }    
 }

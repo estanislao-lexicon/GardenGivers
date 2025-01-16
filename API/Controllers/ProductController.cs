@@ -83,7 +83,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("{productId:int}")]
-        public async Task<IActionResult> Update([FromRoute] int productId, [FromBody] UpdateProductRequestDto updatedDto)
+        public async Task<IActionResult> Update([FromRoute] int productId, [FromBody] UpdateProductDto updatedDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
