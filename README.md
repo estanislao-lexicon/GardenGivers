@@ -1,5 +1,8 @@
-# GardenGivers
+<p align="center">
+  <img src="./frontend/src/Components/Hero/logo512.png" alt="Garden giver circel logo"/>
+</p >
 
+# Garden Givers
 
 GardenGivers is a community-driven platform that connects people who want to share or request homegrown produce. It aims to reduce food waste and promote a sharing economy within local communities.
 

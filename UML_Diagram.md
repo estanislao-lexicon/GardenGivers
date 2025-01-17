@@ -48,6 +48,6 @@
     Product ||--o{ Offers : "1-to-many"
     Offers ||--o{ Requests : "1-to-many"
     Offers ||--o{ Transactions : "1-to-many"
-    Requests ||--o{ Transactions : "1-to-many"
+    Requests ||--o{ Transactions : "1-to-1"
 
 ```
