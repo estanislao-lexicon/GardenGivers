@@ -4,12 +4,12 @@
 
 # Garden Givers
 
-GardenGivers is a community-driven platform that connects people who want to share or request homegrown produce. It aims to reduce food waste and promote a sharing economy within local communities.
+Garden givers is a community-driven platform that connects people who want to share or request homegrown produce. It aims to reduce food waste and promote a sharing economy within local communities.
 
 ## Features
 
 - **User Management**: Register, login, and manage user profiles.
-- **Produce Listingsv**: Create, view, and manage produce offers and requests.
+- **Produce Listingsv**: Create, view, and manage offers and requests.
 - **Transactions**: Facilitate and track transactions between users.
 
 ## UML Diagram
